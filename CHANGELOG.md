@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.4] - 2024-11-28
+
+### Added
+
+#### Testing Feature
+
+- **Optional testing support** with Vitest + React Testing Library
+- **`testing` feature flag** in FeatureFlags interface
+- **Test dependencies** - vitest, @vitest/coverage-v8, @vitest/ui, @testing-library/react, @testing-library/jest-dom, @testing-library/user-event, jsdom
+- **Test scripts** - `test`, `test:watch`, `test:ui`, `test:coverage`
+- **Vitest configuration generator** with coverage thresholds (70%)
+- **Test setup file** with mocks for IntersectionObserver, ResizeObserver, matchMedia
+- **Test utilities** file with custom render function for providers
+- **Feature-specific tests**:
+  - App.test.tsx - Base component tests
+  - store.test.ts - Redux slice/store tests (when Redux enabled)
+  - redux-integration.test.tsx - Redux integration tests
+  - router.test.tsx - React Router navigation tests
+- **CI integration** - Tests run in GitHub Actions with coverage upload
+- **Husky integration** - Tests run in pre-commit hook when testing enabled
+- **VS Code integration** - Vitest explorer extension recommendation
+
+#### CLI Tests
+
+- **50 unit tests** for the CLI project itself
+- **templates.test.ts** - Template configuration tests
+- **dependencies.test.ts** - Dependency generation tests
+- **validation.test.ts** - Project name validation tests
+- **version.test.ts** - Version utility tests
+- **vitest.config.ts** for CLI project with coverage
+
+### Changed
+
+- Updated `full-pack` template to include testing by default
+- Updated generated tsconfig.json to include vitest type reference
+- Updated generated GitHub Actions workflow with test step
+- Updated generated Husky pre-commit to optionally run tests
+- Updated generated VS Code settings with Vitest configuration
+
 ## [0.0.3] - 2024-11-28
 
 ### Added

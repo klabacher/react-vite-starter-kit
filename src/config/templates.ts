@@ -11,6 +11,7 @@ const defaultFeatures: FeatureFlags = {
   husky: false,
   githubActions: false,
   vscode: false,
+  testing: false,
 };
 
 // Predefined templates
@@ -41,7 +42,8 @@ export const templates: Template[] = [
   {
     id: 'full-pack',
     name: 'Full Pack',
-    description: 'Everything included: Redux, React Router, TailwindCSS, Linting, Husky, CI/CD',
+    description:
+      'Everything included: Redux, React Router, TailwindCSS, Linting, Husky, CI/CD, Testing',
     icon: '🚀',
     color: 'magenta',
     features: {
@@ -54,6 +56,7 @@ export const templates: Template[] = [
       husky: true,
       githubActions: true,
       vscode: true,
+      testing: true,
     },
   },
   {
@@ -117,6 +120,11 @@ export const featureDescriptions: Record<
     name: 'VS Code Config',
     description: 'Editor settings, extensions, and launch configs',
     icon: '💻',
+  },
+  testing: {
+    name: 'Vitest + Testing Library',
+    description: 'Unit & component testing with Vitest and React Testing Library',
+    icon: '🧪',
   },
 };
 

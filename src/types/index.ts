@@ -12,6 +12,7 @@ export interface FeatureFlags {
   husky: boolean;
   githubActions: boolean;
   vscode: boolean;
+  testing: boolean;
 }
 
 // Base packages always included
@@ -44,7 +45,14 @@ export type DevPackage =
   | 'prettier'
   | 'globals'
   | 'husky'
-  | 'lint-staged';
+  | 'lint-staged'
+  | 'vitest'
+  | '@vitest/coverage-v8'
+  | '@vitest/ui'
+  | '@testing-library/react'
+  | '@testing-library/jest-dom'
+  | '@testing-library/user-event'
+  | 'jsdom';
 
 // Template definition
 export interface Template {

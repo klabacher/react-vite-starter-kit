@@ -66,6 +66,17 @@ const featureDependencies: Record<
       'lint-staged': '^16.1.0',
     },
   },
+  testing: {
+    devDeps: {
+      vitest: '^3.1.4',
+      '@vitest/coverage-v8': '^3.1.4',
+      '@vitest/ui': '^3.1.4',
+      '@testing-library/react': '^16.2.0',
+      '@testing-library/jest-dom': '^6.6.3',
+      '@testing-library/user-event': '^14.6.1',
+      jsdom: '^26.1.0',
+    },
+  },
 };
 
 export function generateDependencies(features: FeatureFlags): DependencyVersions {
@@ -98,6 +109,10 @@ export function generateDependencies(features: FeatureFlags): DependencyVersions
     Object.assign(devDependencies, featureDependencies.husky.devDeps);
   }
 
+  if (features.testing) {
+    Object.assign(devDependencies, featureDependencies.testing.devDeps);
+  }
+
   return { dependencies, devDependencies };
 }
 
@@ -120,6 +135,13 @@ export function generateScripts(features: FeatureFlags): Record<string, string> 
 
   if (features.husky) {
     scripts.prepare = 'husky';
+  }
+
+  if (features.testing) {
+    scripts.test = 'vitest run';
+    scripts['test:watch'] = 'vitest';
+    scripts['test:ui'] = 'vitest --ui';
+    scripts['test:coverage'] = 'vitest run --coverage';
   }
 
   return scripts;

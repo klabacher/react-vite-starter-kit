@@ -18,6 +18,7 @@
 - 🐶 **Husky + lint-staged** - Git hooks for code quality (optional)
 - 🔄 **GitHub Actions** - CI/CD pipeline ready (optional)
 - 📝 **VS Code Config** - Editor settings and extensions (optional)
+- 🧪 **Vitest + Testing Library** - Unit & component testing (optional)
 
 ## 📋 Requirements
 
@@ -93,6 +94,11 @@ my-app/
 │   ├── Redux/           # With Redux Toolkit
 │   │   ├── Store.ts
 │   │   └── Slice.ts
+│   ├── test/            # With Testing
+│   │   ├── setup.ts
+│   │   └── test-utils.tsx
+│   ├── __tests__/       # With Testing
+│   │   └── App.test.tsx
 │   ├── App.tsx
 │   ├── App.css
 │   └── main.tsx
@@ -104,6 +110,7 @@ my-app/
 ├── .vscode/             # With VS Code config
 │   ├── settings.json
 │   └── extensions.json
+├── vitest.config.ts     # With Testing
 ├── eslint.config.js     # With ESLint
 ├── .prettierrc          # With Prettier
 ├── tailwind.config.ts   # With TailwindCSS
@@ -164,6 +171,7 @@ npm publish --access public
 - [ ] Rolldown-vite option
 - [ ] Legacy Vite option
 - [ ] More framework templates
+- [ ] Visual regression testing (Playwright/Storybook)
 
 ## 📄 License
 

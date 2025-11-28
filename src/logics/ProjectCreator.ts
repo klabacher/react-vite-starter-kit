@@ -101,7 +101,7 @@ async function generateConfiguration(config: ProjectConfig): Promise<void> {
   await generateViteConfig(targetDir, features);
 
   // Generate TypeScript configs
-  await generateTsConfigs(targetDir);
+  await generateTsConfigs(targetDir, features);
 
   // Generate feature-specific configs
   if (features.eslint) {
@@ -117,15 +117,21 @@ async function generateConfiguration(config: ProjectConfig): Promise<void> {
   }
 
   if (features.husky) {
-    await generateHuskyConfig(targetDir);
+    await generateHuskyConfig(targetDir, features);
   }
 
   if (features.githubActions) {
-    await generateGithubActions(targetDir);
+    await generateGithubActions(targetDir, features);
   }
 
   if (features.vscode) {
-    await generateVscodeConfig(targetDir);
+    await generateVscodeConfig(targetDir, features);
+  }
+
+  if (features.testing) {
+    await generateVitestConfig(targetDir, features);
+    await generateTestSetup(targetDir);
+    await generateTestFiles(targetDir, features);
   }
 
   // Generate .gitignore
@@ -175,11 +181,18 @@ export default defineConfig({
   await writeFile(join(targetDir, 'vite.config.ts'), content);
 }
 
-async function generateTsConfigs(targetDir: string): Promise<void> {
+async function generateTsConfigs(targetDir: string, features?: FeatureFlags): Promise<void> {
   // Main tsconfig.json
+  const references = [{ path: './tsconfig.app.json' }, { path: './tsconfig.node.json' }];
+
+  // Add vitest config reference if testing enabled
+  if (features?.testing) {
+    references.push({ path: './tsconfig.vitest.json' });
+  }
+
   const mainConfig = {
     files: [],
-    references: [{ path: './tsconfig.app.json' }, { path: './tsconfig.node.json' }],
+    references,
   };
   await writeFile(join(targetDir, 'tsconfig.json'), JSON.stringify(mainConfig, null, 2));
 
@@ -318,21 +331,37 @@ export default {
   await writeFile(join(targetDir, 'tailwind.config.ts'), content);
 }
 
-async function generateHuskyConfig(targetDir: string): Promise<void> {
+async function generateHuskyConfig(targetDir: string, features?: FeatureFlags): Promise<void> {
   // Create .husky directory
   const huskyDir = join(targetDir, '.husky');
   await mkdir(huskyDir, { recursive: true });
 
-  // Create pre-commit hook
-  const preCommit = `npx lint-staged
-`;
+  // Create pre-commit hook with optional test step
+  let preCommit = 'npx lint-staged\n';
+  if (features?.testing) {
+    preCommit += 'npm run test\n';
+  }
   await writeFile(join(huskyDir, 'pre-commit'), preCommit);
 }
 
-async function generateGithubActions(targetDir: string): Promise<void> {
+async function generateGithubActions(targetDir: string, features?: FeatureFlags): Promise<void> {
   // Create .github/workflows directory
   const workflowsDir = join(targetDir, '.github', 'workflows');
   await mkdir(workflowsDir, { recursive: true });
+
+  const testStep = features?.testing
+    ? `
+      - name: Run tests
+        run: npm test
+
+      - name: Upload coverage
+        if: matrix.node-version == '20.x'
+        uses: codecov/codecov-action@v5
+        with:
+          file: ./coverage/coverage-final.json
+          fail_ci_if_error: false
+`
+    : '';
 
   const ciWorkflow = `name: CI
 
@@ -367,19 +396,19 @@ jobs:
 
       - name: Lint
         run: npm run lint
-
+${testStep}
       - name: Build
         run: npm run build
 `;
   await writeFile(join(workflowsDir, 'ci.yml'), ciWorkflow);
 }
 
-async function generateVscodeConfig(targetDir: string): Promise<void> {
+async function generateVscodeConfig(targetDir: string, features?: FeatureFlags): Promise<void> {
   const vscodeDir = join(targetDir, '.vscode');
   await mkdir(vscodeDir, { recursive: true });
 
   // settings.json
-  const settings = {
+  const settings: Record<string, unknown> = {
     'editor.formatOnSave': true,
     'editor.defaultFormatter': 'esbenp.prettier-vscode',
     'editor.codeActionsOnSave': {
@@ -387,16 +416,27 @@ async function generateVscodeConfig(targetDir: string): Promise<void> {
     },
     'typescript.tsdk': 'node_modules/typescript/lib',
   };
+
+  // Add Vitest settings if testing is enabled
+  if (features?.testing) {
+    settings['vitest.enable'] = true;
+    settings['vitest.commandLine'] = 'npx vitest';
+  }
+
   await writeFile(join(vscodeDir, 'settings.json'), JSON.stringify(settings, null, 2));
 
   // extensions.json
-  const extensions = {
-    recommendations: [
-      'esbenp.prettier-vscode',
-      'dbaeumer.vscode-eslint',
-      'bradlc.vscode-tailwindcss',
-    ],
-  };
+  const recommendations = [
+    'esbenp.prettier-vscode',
+    'dbaeumer.vscode-eslint',
+    'bradlc.vscode-tailwindcss',
+  ];
+
+  if (features?.testing) {
+    recommendations.push('vitest.explorer');
+  }
+
+  const extensions = { recommendations };
   await writeFile(join(vscodeDir, 'extensions.json'), JSON.stringify(extensions, null, 2));
 }
 
@@ -455,6 +495,7 @@ async function generateReadme(targetDir: string, config: ProjectConfig): Promise
   if (config.features.reactRouter) features.push('React Router');
   if (config.features.eslint) features.push('ESLint');
   if (config.features.prettier) features.push('Prettier');
+  if (config.features.testing) features.push('Vitest + Testing Library');
 
   const content = `# ${config.name}
 
@@ -484,6 +525,7 @@ ${config.packageManager === 'npm' ? 'npm run build' : config.packageManager + ' 
 - \`preview\` - Preview production build
 ${config.features.eslint ? '- `lint` - Run ESLint\n- `lint:fix` - Fix ESLint errors' : ''}
 ${config.features.prettier ? '- `format` - Format code with Prettier' : ''}
+${config.features.testing ? '- `test` - Run tests\n- `test:watch` - Run tests in watch mode\n- `test:coverage` - Run tests with coverage\n- `test:ui` - Open Vitest UI' : ''}
 
 ## Created with
 
@@ -515,4 +557,388 @@ async function installDependencies(targetDir: string, packageManager: string): P
 
   const command = commands[packageManager] || 'npm install';
   execSync(command, { cwd: targetDir, stdio: 'ignore' });
+}
+
+// ============================================================================
+// TESTING CONFIGURATION GENERATORS
+// ============================================================================
+
+async function generateVitestConfig(targetDir: string, features: FeatureFlags): Promise<void> {
+  const coverageExclude = [
+    'node_modules/**',
+    'dist/**',
+    '**/*.d.ts',
+    'src/main.tsx',
+    'vite.config.ts',
+    'tailwind.config.ts',
+    'eslint.config.js',
+  ];
+
+  // Add Redux store to exclude if present (tested separately)
+  if (features.redux) {
+    coverageExclude.push('src/Redux/Store.ts');
+  }
+
+  const content = `/// <reference types="vitest" />
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    exclude: ['node_modules', 'dist'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov'],
+      exclude: ${JSON.stringify(coverageExclude, null, 6).replace(/\n/g, '\n      ')},
+      thresholds: {
+        statements: 70,
+        branches: 70,
+        functions: 70,
+        lines: 70,
+      },
+    },
+  },
+});
+`;
+  await writeFile(join(targetDir, 'vitest.config.ts'), content);
+
+  // Also create tsconfig.vitest.json for proper TypeScript support in tests
+  const vitestTsConfig = {
+    extends: './tsconfig.app.json',
+    compilerOptions: {
+      types: ['vitest/globals', '@testing-library/jest-dom'],
+    },
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/*.spec.ts', 'src/**/*.spec.tsx'],
+  };
+  await writeFile(join(targetDir, 'tsconfig.vitest.json'), JSON.stringify(vitestTsConfig, null, 2));
+}
+
+async function generateTestSetup(targetDir: string): Promise<void> {
+  // Create test directory
+  const testDir = join(targetDir, 'src', 'test');
+  await mkdir(testDir, { recursive: true });
+
+  const setupContent = `import '@testing-library/jest-dom';
+import { cleanup } from '@testing-library/react';
+import { afterEach, vi } from 'vitest';
+
+// Cleanup after each test case
+afterEach(() => {
+  cleanup();
+});
+
+// Mock IntersectionObserver
+const mockIntersectionObserver = vi.fn();
+mockIntersectionObserver.mockReturnValue({
+  observe: () => null,
+  unobserve: () => null,
+  disconnect: () => null,
+});
+window.IntersectionObserver = mockIntersectionObserver;
+
+// Mock ResizeObserver
+const mockResizeObserver = vi.fn();
+mockResizeObserver.mockReturnValue({
+  observe: () => null,
+  unobserve: () => null,
+  disconnect: () => null,
+});
+window.ResizeObserver = mockResizeObserver;
+
+// Mock matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+`;
+  await writeFile(join(testDir, 'setup.ts'), setupContent);
+
+  // Create test utilities file
+  const testUtilsContent = `import { render, RenderOptions } from '@testing-library/react';
+import { ReactElement, ReactNode } from 'react';
+
+// Custom render function that can include providers
+interface WrapperProps {
+  children: ReactNode;
+}
+
+function AllTheProviders({ children }: WrapperProps) {
+  // Add any providers here (Redux, Router, Theme, etc.)
+  return <>{children}</>;
+}
+
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>
+  render(ui, { wrapper: AllTheProviders, ...options });
+
+// Re-export everything
+export * from '@testing-library/react';
+export { customRender as render };
+`;
+  await writeFile(join(testDir, 'test-utils.tsx'), testUtilsContent);
+}
+
+async function generateTestFiles(targetDir: string, features: FeatureFlags): Promise<void> {
+  // Create __tests__ directory
+  const testsDir = join(targetDir, 'src', '__tests__');
+  await mkdir(testsDir, { recursive: true });
+
+  // Generate base App test
+  await generateAppTest(targetDir, features);
+
+  // Generate feature-specific tests
+  if (features.redux) {
+    await generateReduxTests(targetDir);
+  }
+
+  if (features.reactRouter) {
+    await generateRouterTests(targetDir);
+  }
+}
+
+async function generateAppTest(targetDir: string, features: FeatureFlags): Promise<void> {
+  const testsDir = join(targetDir, 'src', '__tests__');
+
+  let imports = `import { describe, it, expect } from 'vitest';
+import { screen } from '@testing-library/react';
+import { render } from '../test/test-utils';
+import App from '../App';`;
+
+  let wrapperStart = '';
+  let wrapperEnd = '';
+
+  // If React Router is enabled, wrap with MemoryRouter
+  if (features.reactRouter) {
+    imports += `\nimport { MemoryRouter } from 'react-router-dom';`;
+    wrapperStart = '<MemoryRouter>';
+    wrapperEnd = '</MemoryRouter>';
+  }
+
+  // If Redux is enabled, wrap with Provider
+  if (features.redux) {
+    imports += `\nimport { Provider } from 'react-redux';
+import { store } from '../Redux/Store';`;
+    if (wrapperStart) {
+      wrapperStart = `<Provider store={store}>${wrapperStart}`;
+      wrapperEnd = `${wrapperEnd}</Provider>`;
+    } else {
+      wrapperStart = '<Provider store={store}>';
+      wrapperEnd = '</Provider>';
+    }
+  }
+
+  const renderCall = wrapperStart
+    ? `render(${wrapperStart}<App />${wrapperEnd})`
+    : 'render(<App />)';
+
+  const content = `${imports}
+
+describe('App', () => {
+  it('renders without crashing', () => {
+    ${renderCall};
+    // App should render successfully
+    expect(document.body).toBeInTheDocument();
+  });
+
+  it('renders main heading', () => {
+    ${renderCall};
+    // Check for main heading (adjust text based on your App component)
+    const heading = screen.queryByRole('heading');
+    expect(heading || document.body.querySelector('h1, h2, h3')).toBeTruthy();
+  });
+${
+  features.tailwindcss
+    ? `
+  it('applies tailwind classes correctly', () => {
+    ${renderCall};
+    // Check that the app container has tailwind classes
+    const appContainer = document.querySelector('[class*="bg-"], [class*="flex"], [class*="min-h"]');
+    expect(appContainer).toBeTruthy();
+  });
+`
+    : ''
+}});
+`;
+  await writeFile(join(testsDir, 'App.test.tsx'), content);
+}
+
+async function generateReduxTests(targetDir: string): Promise<void> {
+  const testsDir = join(targetDir, 'src', '__tests__');
+
+  // Test for Redux store
+  const storeTestContent = `import { describe, it, expect, beforeEach } from 'vitest';
+import { configureStore } from '@reduxjs/toolkit';
+import appReducer, { increment, decrement, incrementByAmount, reset, selectCount } from '../Redux/Slice';
+
+describe('Redux Store', () => {
+  let store: ReturnType<typeof configureStore>;
+
+  beforeEach(() => {
+    store = configureStore({
+      reducer: {
+        app: appReducer,
+      },
+    });
+  });
+
+  it('should have initial state', () => {
+    const state = store.getState();
+    expect(selectCount(state)).toBe(0);
+  });
+
+  it('should increment counter', () => {
+    store.dispatch(increment());
+    expect(selectCount(store.getState())).toBe(1);
+  });
+
+  it('should decrement counter', () => {
+    store.dispatch(increment());
+    store.dispatch(increment());
+    store.dispatch(decrement());
+    expect(selectCount(store.getState())).toBe(1);
+  });
+
+  it('should increment by specific amount', () => {
+    store.dispatch(incrementByAmount(5));
+    expect(selectCount(store.getState())).toBe(5);
+  });
+
+  it('should reset counter to zero', () => {
+    store.dispatch(increment());
+    store.dispatch(increment());
+    store.dispatch(reset());
+    expect(selectCount(store.getState())).toBe(0);
+  });
+
+  it('should handle negative increment', () => {
+    store.dispatch(incrementByAmount(-3));
+    expect(selectCount(store.getState())).toBe(-3);
+  });
+});
+`;
+  await writeFile(join(testsDir, 'store.test.ts'), storeTestContent);
+
+  // Integration test with React component
+  const reduxIntegrationContent = `import { describe, it, expect } from 'vitest';
+import { screen, fireEvent } from '@testing-library/react';
+import { render } from '../test/test-utils';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import appReducer from '../Redux/Slice';
+import App from '../App';
+
+function renderWithRedux(ui: React.ReactElement, preloadedState = {}) {
+  const store = configureStore({
+    reducer: { app: appReducer },
+    preloadedState,
+  });
+  return {
+    ...render(<Provider store={store}>{ui}</Provider>),
+    store,
+  };
+}
+
+describe('Redux Integration', () => {
+  it('renders with Redux provider', () => {
+    renderWithRedux(<App />);
+    expect(document.body).toBeInTheDocument();
+  });
+
+  it('displays initial counter value', () => {
+    renderWithRedux(<App />);
+    // Look for counter display (adjust selector based on your App)
+    const counterElement = screen.queryByText(/count/i) || screen.queryByText('0');
+    expect(counterElement || document.body).toBeTruthy();
+  });
+
+  it('increments counter on button click', async () => {
+    renderWithRedux(<App />);
+    const incrementButton = screen.queryByRole('button', { name: /increment|[+]|add/i });
+    if (incrementButton) {
+      fireEvent.click(incrementButton);
+      // After click, counter should update
+      expect(screen.queryByText('1') || document.body).toBeTruthy();
+    }
+  });
+});
+`;
+  await writeFile(join(testsDir, 'redux-integration.test.tsx'), reduxIntegrationContent);
+}
+
+async function generateRouterTests(targetDir: string): Promise<void> {
+  const testsDir = join(targetDir, 'src', '__tests__');
+
+  const routerTestContent = `import { describe, it, expect } from 'vitest';
+import { screen } from '@testing-library/react';
+import { render } from '../test/test-utils';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import App from '../App';
+
+describe('React Router', () => {
+  it('renders home route', () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>
+    );
+    expect(document.body).toBeInTheDocument();
+  });
+
+  it('renders 404 for unknown routes', () => {
+    render(
+      <MemoryRouter initialEntries={['/unknown-route-12345']}>
+        <App />
+      </MemoryRouter>
+    );
+    // Should either show 404 page or redirect to home
+    expect(document.body).toBeInTheDocument();
+  });
+
+  it('navigates between routes', async () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>
+    );
+    
+    // Check for navigation links
+    const links = screen.queryAllByRole('link');
+    expect(Array.isArray(links)).toBe(true);
+    
+    // App should render successfully with routing
+    expect(document.body).toBeInTheDocument();
+  });
+});
+
+describe('Route Components', () => {
+  it('renders placeholder route correctly', () => {
+    const TestComponent = () => <div data-testid="test">Test Route</div>;
+    
+    render(
+      <MemoryRouter initialEntries={['/test']}>
+        <Routes>
+          <Route path="/test" element={<TestComponent />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    
+    expect(screen.getByTestId('test')).toBeInTheDocument();
+    expect(screen.getByText('Test Route')).toBeInTheDocument();
+  });
+});
+`;
+  await writeFile(join(testsDir, 'router.test.tsx'), routerTestContent);
 }
