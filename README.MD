@@ -1,79 +1,174 @@
-# react-vite-starter-kit - Development Plan for V1
+# react-vite-starter-kit
 
-This projects aims a Out-Of-The-Box experience when creating React + Vite Apps. Focusing on scaffolding comonly used features on Vite Projects without the headdaque of always redoing the same code. Just type `npx react-vite-starter-kit` and select templates or build your custom project.
+> 🚀 Out-Of-The-Box React + Vite project scaffolding with commonly used features. Just type `npx react-vite-starter-kit` and start building!
 
-Be Faster!
+[![npm version](https://img.shields.io/npm/v/react-vite-starter-kit.svg)](https://www.npmjs.com/package/react-vite-starter-kit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## For Later publish
+## ✨ Features
 
+- 🎯 **Interactive CLI** - Beautiful terminal UI built with Ink & Commander
+- 📦 **Multiple Templates** - Choose from minimal, standard, full-pack, or custom
+- ⚡ **Vite + React** - Lightning fast development with hot module replacement
+- 🔷 **TypeScript** - Full TypeScript support out of the box
+- 🎨 **TailwindCSS** - Utility-first CSS framework (optional)
+- 🔄 **Redux Toolkit** - State management made easy (optional)
+- 🧭 **React Router** - Client-side routing (optional)
+- 📏 **ESLint + Prettier** - Code quality and formatting (optional)
+- 🐶 **Husky + lint-staged** - Git hooks for code quality (optional)
+- 🔄 **GitHub Actions** - CI/CD pipeline ready (optional)
+- 📝 **VS Code Config** - Editor settings and extensions (optional)
+
+## 📋 Requirements
+
+- **Node.js** >= 18.0.0
+- **npm** >= 9.0.0
+
+## 🚀 Quick Start
+
+```bash
+# Create a new project interactively
+npx react-vite-starter-kit my-app
+
+# Use a specific template
+npx react-vite-starter-kit my-app --template full-pack
+
+# Skip prompts with defaults
+npx react-vite-starter-kit my-app --yes
+
+# Skip git initialization
+npx react-vite-starter-kit my-app --no-git
+
+# Skip dependency installation
+npx react-vite-starter-kit my-app --no-install
+```
+
+## 📁 Templates
+
+### 🟢 Minimal
+Basic React + Vite + TypeScript setup. Perfect for learning or small projects.
+
+**Includes:** React, Vite, TypeScript
+
+### 🔵 Standard
+Recommended setup with routing, state management, and TailwindCSS.
+
+**Includes:** React, Vite, TypeScript, React Router, Redux Toolkit, TailwindCSS
+
+### 🟣 Full Pack
+Everything included! Complete development environment with all bells and whistles.
+
+**Includes:** All Standard features + ESLint, Prettier, Husky, GitHub Actions, VS Code config
+
+### ⚪ Custom
+Build your own! Select exactly what you need.
+
+**Choose from:** React Router, Redux Toolkit, TailwindCSS, ESLint, Prettier, Husky, GitHub Actions, VS Code config
+
+## 🛠️ CLI Options
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--template <name>` | `-t` | Use a specific template (minimal, standard, full-pack) |
+| `--yes` | `-y` | Skip prompts and use defaults |
+| `--no-git` | | Skip git initialization |
+| `--no-install` | | Skip dependency installation |
+| `--help` | `-h` | Show help |
+| `--version` | `-V` | Show version |
+
+## 📂 Project Structure
+
+```
+my-app/
+├── public/
+│   └── index.html
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── pages/           # With React Router
+│   ├── Redux/           # With Redux Toolkit
+│   │   ├── Store.ts
+│   │   └── Slice.ts
+│   ├── App.tsx
+│   ├── App.css
+│   └── main.tsx
+├── .github/             # With GitHub Actions
+│   └── workflows/
+│       └── ci.yml
+├── .husky/              # With Husky
+│   └── pre-commit
+├── .vscode/             # With VS Code config
+│   ├── settings.json
+│   └── extensions.json
+├── eslint.config.js     # With ESLint
+├── .prettierrc          # With Prettier
+├── tailwind.config.ts   # With TailwindCSS
+├── tsconfig.json
+├── vite.config.ts
+└── package.json
+```
+
+## 🔧 Development
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/react-vite-starter-kit.git
+cd react-vite-starter-kit
+
+# Install dependencies
+npm install
+
+# Build
+npm run build
+
+# Run locally
+node dist/main.js --help
+
+# Development mode with watch
+npm run dev
+```
+
+### Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run build` | Build the CLI |
+| `npm run dev` | Build with watch mode |
+| `npm run lint` | Run ESLint |
+| `npm run lint:fix` | Fix ESLint errors |
+| `npm run format` | Format with Prettier |
+| `npm run format:check` | Check formatting |
+| `npm run typecheck` | TypeScript type checking |
+| `npm run prepare` | Setup Husky hooks |
+
+## 📝 Publishing
+
+```bash
+# Build and publish to npm
+npm run build
 npm publish --access public
+```
 
-## Should install and configure
+## 🗺️ Roadmap
 
-- Node - I think node v22 or greatter shoulb be good
+- [ ] Yarn/pnpm/bun package manager support
+- [ ] Supabase integration template
+- [ ] Custom TypeScript configurations
+- [ ] Custom linting profiles
+- [ ] Rolldown-vite option
+- [ ] Legacy Vite option
+- [ ] More framework templates
 
-- Package managers: npm, maybe yarn??
+## 📄 License
 
-Check for compatibilite versions with this boilerplate version and yells if not comatipable. Asks for update
+MIT © [Your Name]
 
-## Initial Config
+## 🤝 Contributing
 
-- Asks for compatible folder
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
 
-- Asks for node compatible project name, author, license and etc. Like npm init
+---
 
-- asks if its going to init git project. If yes, check for git command line and initialize with same name and details from project.json. If not fails and asks for installing git with a link tutorial and install "sudo apt-get install git" message
-
-## Bare Deps
-
-- Vite + using rolldown-vite + configuration depending what is installed
-
-- React + React-dom - configuration
-
-TODO: Add legacy vite option
-
-## Optional Deps/outofbox features
-
-- React-Router-Dom + Setup Provider and a base "/" + "/404" setup
-
-- Redux/Redux Toolkit + Configured default Slice & Store
-
-- TailwindCSS + Direcly as index.css import for easier manipulation later
-
-## Ready to go - Adaptive Configuration
-
-All of them, in case of the selcted packages will be modify for compatibly with the project and their packages
-
-### Necessary Deps Config
-
-- Typescript setup - Necessary - Modify based on optional Deps
-
-- Vite - Necessary - May be modify based on optional deps
-
-- Package.json config based on Selected Packages
-
-### Optional Deps Config
-
-- TailwindCSS configurations on app(Base) Ex: tailwind.config.ts. If other options selected then configure -> Prettier, Editor and Eslint with robust configurations
-
-- Eslint + configuration
-
-- Prettier + configuration
-
-### Optional Project Configurations
-
-- ".github" CI/CD - Github Actions - Out of the box
-
-- VSCode Editor simple features ".vscode" + .editorconfig
-
-## Cli Configuration
-
-CLI for selecting templates or custom packages based on commander and INK - Cli React Components
-
-## For Later Versions
-
-- TODO: Supabase. Later implementaion only
-- TODO: Custom configurations for typescript
-- TODO: Custom configurations for linting and TypeCheck
-
-- some more stuff idk
+**Be Faster!** ⚡
