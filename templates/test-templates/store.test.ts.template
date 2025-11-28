@@ -1,0 +1,100 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { store } from '../Redux/Store';
+import { 
+  increment, 
+  decrement, 
+  incrementByAmount,
+  reset,
+  selectCount 
+} from '../Redux/Slice';
+
+describe('Redux Store', () => {
+  beforeEach(() => {
+    store.dispatch(reset());
+  });
+
+  describe('Store Configuration', () => {
+    it('should have initial state', () => {
+      const state = store.getState();
+      expect(state).toBeDefined();
+      expect(typeof state).toBe('object');
+    });
+
+    it('should have counter slice', () => {
+      const state = store.getState();
+      expect(state.counter).toBeDefined();
+    });
+
+    it('should have initial count of 0', () => {
+      const state = store.getState();
+      expect(selectCount(state)).toBe(0);
+    });
+  });
+
+  describe('Counter Actions', () => {
+    it('should increment counter', () => {
+      store.dispatch(increment());
+      const state = store.getState();
+      expect(selectCount(state)).toBe(1);
+    });
+
+    it('should decrement counter', () => {
+      store.dispatch(increment());
+      store.dispatch(increment());
+      store.dispatch(decrement());
+      const state = store.getState();
+      expect(selectCount(state)).toBe(1);
+    });
+
+    it('should increment by amount', () => {
+      store.dispatch(incrementByAmount(5));
+      const state = store.getState();
+      expect(selectCount(state)).toBe(5);
+    });
+
+    it('should handle negative increment amount', () => {
+      store.dispatch(incrementByAmount(-3));
+      const state = store.getState();
+      expect(selectCount(state)).toBe(-3);
+    });
+
+    it('should reset to initial state', () => {
+      store.dispatch(increment());
+      store.dispatch(increment());
+      store.dispatch(reset());
+      const state = store.getState();
+      expect(selectCount(state)).toBe(0);
+    });
+
+    it('should handle multiple sequential actions', () => {
+      store.dispatch(increment());
+      store.dispatch(incrementByAmount(10));
+      store.dispatch(decrement());
+      store.dispatch(incrementByAmount(5));
+      const state = store.getState();
+      expect(selectCount(state)).toBe(15);
+    });
+  });
+
+  describe('Selectors', () => {
+    it('should select count correctly', () => {
+      store.dispatch(incrementByAmount(42));
+      expect(selectCount(store.getState())).toBe(42);
+    });
+  });
+
+  describe('Store Subscription', () => {
+    it('should notify subscribers on state change', () => {
+      let callCount = 0;
+      const unsubscribe = store.subscribe(() => {
+        callCount++;
+      });
+
+      store.dispatch(increment());
+      store.dispatch(decrement());
+
+      expect(callCount).toBe(2);
+      unsubscribe();
+    });
+  });
+});

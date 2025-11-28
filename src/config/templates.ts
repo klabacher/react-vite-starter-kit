@@ -126,6 +126,11 @@ export const featureDescriptions: Record<
     description: 'Unit & component testing with Vitest and React Testing Library',
     icon: '🧪',
   },
+  testProfile: {
+    name: 'Test Profile',
+    description: 'Choose a predefined testing setup',
+    icon: '🧩',
+  },
 };
 
 export function getTemplateById(id: string): Template | undefined {

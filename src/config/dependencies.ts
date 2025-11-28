@@ -1,4 +1,5 @@
 import type { FeatureFlags, DependencyVersions } from '../types/index.js';
+import { getTestDependencies } from './testProfiles.js';
 
 // Base dependencies (always included)
 const baseDependencies: Record<string, string> = {
@@ -13,6 +14,19 @@ const baseDevDependencies: Record<string, string> = {
   '@types/react-dom': '^18.3.7',
   '@types/node': '^22.15.0',
   vite: 'npm:rolldown-vite@7.2.5',
+};
+
+// Testing dependency versions mapping
+const testingDependencyVersions: Record<string, string> = {
+  vitest: '^3.1.4',
+  jsdom: '^26.1.0',
+  '@testing-library/react': '^16.2.0',
+  '@testing-library/jest-dom': '^6.6.3',
+  '@testing-library/user-event': '^14.6.1',
+  '@vitest/coverage-v8': '^3.1.4',
+  '@vitest/ui': '^3.1.4',
+  'jest-axe': '^9.0.0',
+  '@types/jest-axe': '^3.5.9',
 };
 
 // Feature-specific dependencies
@@ -66,17 +80,6 @@ const featureDependencies: Record<
       'lint-staged': '^16.1.0',
     },
   },
-  testing: {
-    devDeps: {
-      vitest: '^3.1.4',
-      '@vitest/coverage-v8': '^3.1.4',
-      '@vitest/ui': '^3.1.4',
-      '@testing-library/react': '^16.2.0',
-      '@testing-library/jest-dom': '^6.6.3',
-      '@testing-library/user-event': '^14.6.1',
-      jsdom: '^26.1.0',
-    },
-  },
 };
 
 export function generateDependencies(features: FeatureFlags): DependencyVersions {
@@ -109,8 +112,17 @@ export function generateDependencies(features: FeatureFlags): DependencyVersions
     Object.assign(devDependencies, featureDependencies.husky.devDeps);
   }
 
+  // Add testing dependencies based on profile
   if (features.testing) {
-    Object.assign(devDependencies, featureDependencies.testing.devDeps);
+    const testProfile = features.testProfile || 'standard';
+    const testDeps = getTestDependencies(testProfile);
+
+    // Add each testing dependency with its version
+    for (const dep of testDeps) {
+      if (testingDependencyVersions[dep]) {
+        devDependencies[dep] = testingDependencyVersions[dep];
+      }
+    }
   }
 
   return { dependencies, devDependencies };

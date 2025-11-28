@@ -39,8 +39,50 @@ jobs:
       - name: Build
         run: npm run build
 # Create a separate job to full build templates and test them individually for each version of node
-  publish:
+  
+  # Test generated projects for each template
+  test-templates:
     needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        template: [minimal, standard, full-pack]
+        node-version: [18.x, 20.x, 22.x]
+    
+    steps:
+      - uses: actions/checkout@v5
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Install CLI dependencies
+        run: npm ci
+      
+      - name: Build CLI
+        run: npm run build
+      
+      - name: Generate ${{ matrix.template }} project
+        run: node dist/main.js test-project --template ${{ matrix.template }} --no-git --no-install
+      
+      - name: Install generated project dependencies
+        run: cd test-project && npm install
+      
+      - name: Build generated project
+        run: cd test-project && npm run build
+      
+      - name: Run generated project tests (if testing enabled)
+        run: |
+          if [ -f "test-project/vitest.config.ts" ]; then
+            cd test-project && npm run test
+          fi
+
+  # Publish only after ALL jobs pass successfully
+  publish:
+    needs: [build, test-templates]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     

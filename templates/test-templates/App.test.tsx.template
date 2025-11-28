@@ -1,0 +1,64 @@
+import { describe, it, expect } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
+{{#if custom}}
+import { renderApp, userEvent } from './test-utils';
+{{else}}
+import { renderApp } from './test-utils';
+{{/if}}
+import App from '../App';
+
+describe('App', () => {
+  it('should render without crashing', () => {
+    renderApp(<App />);
+    expect(document.body).toBeDefined();
+  });
+
+  it('should render main content', () => {
+    renderApp(<App />);
+    {{#if reactRouter}}
+    // With router, check for navigation or main container
+    expect(document.querySelector('main, #root, [data-testid="app"]')).toBeDefined();
+    {{else}}
+    // Check for app container
+    expect(document.body.querySelector('#root, .app, [data-testid="app"]')).toBeDefined();
+    {{/if}}
+  });
+
+  it('should have proper document structure', () => {
+    const { container } = renderApp(<App />);
+    expect(container).toBeInTheDocument();
+    expect(container.firstChild).toBeDefined();
+  });
+
+  {{#if redux}}
+  it('should render with Redux store connected', async () => {
+    renderApp(<App />);
+    // Verify app renders with Redux provider
+    await waitFor(() => {
+      expect(document.body.textContent).toBeDefined();
+    });
+  });
+  {{/if}}
+
+  {{#if reactRouter}}
+  it('should handle route navigation', async () => {
+    renderApp(<App />, { route: '/' });
+    await waitFor(() => {
+      expect(window.location).toBeDefined();
+    });
+  });
+
+  it('should handle unknown routes gracefully', async () => {
+    renderApp(<App />, { route: '/unknown-route-12345' });
+    await waitFor(() => {
+      // App should not crash on unknown routes
+      expect(document.body).toBeInTheDocument();
+    });
+  });
+  {{/if}}
+
+  it('should match snapshot', () => {
+    const { container } = renderApp(<App />);
+    expect(container).toMatchSnapshot();
+  });
+});

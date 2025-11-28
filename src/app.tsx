@@ -1,6 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { Box } from 'ink';
-import type { WizardState, ProjectConfig, Template, FeatureFlags } from './types/index.js';
+import type {
+  WizardState,
+  ProjectConfig,
+  Template,
+  FeatureFlags,
+  TestProfile,
+} from './types/index.js';
 import { templates, getTemplateById, getDefaultTemplate } from './config/templates.js';
 
 // Wizard step components
@@ -8,6 +14,7 @@ import { WelcomeScreen } from './components/WelcomeScreen.js';
 import { ProjectNameInput } from './components/ProjectNameInput.js';
 import { TemplateSelect } from './components/TemplateSelect.js';
 import { FeatureSelect } from './components/FeatureSelect.js';
+import { TestProfileSelect } from './components/TestProfileSelect.js';
 import { PackageManagerSelect } from './components/PackageManagerSelect.js';
 import { GitInitPrompt } from './components/GitInitPrompt.js';
 import { Summary } from './components/Summary.js';
@@ -92,6 +99,9 @@ export function App({
 
       if (template.id === 'custom') {
         goToStep('feature-select');
+      } else if (template.features.testing) {
+        // If template has testing enabled, ask for test profile
+        goToStep('test-profile-select');
       } else {
         goToStep('package-manager');
       }
@@ -103,10 +113,32 @@ export function App({
   const handleFeatureSelect = useCallback(
     (features: FeatureFlags) => {
       updateConfig('features', features);
-      goToStep('package-manager');
+      // If testing is enabled, ask for test profile
+      if (features.testing) {
+        goToStep('test-profile-select');
+      } else {
+        goToStep('package-manager');
+      }
     },
     [updateConfig, goToStep]
   );
+
+  // Handle test profile selection
+  const handleTestProfileSelect = useCallback(
+    (profile: TestProfile) => {
+      const currentFeatures = state.config.features || getDefaultTemplate().features;
+      updateConfig('features', { ...currentFeatures, testing: true, testProfile: profile });
+      goToStep('package-manager');
+    },
+    [updateConfig, goToStep, state.config.features]
+  );
+
+  // Handle skip test profile (disable testing)
+  const handleTestProfileSkip = useCallback(() => {
+    const currentFeatures = state.config.features || getDefaultTemplate().features;
+    updateConfig('features', { ...currentFeatures, testing: false, testProfile: undefined });
+    goToStep('package-manager');
+  }, [updateConfig, goToStep, state.config.features]);
 
   // Handle package manager selection
   const handlePackageManagerSelect = useCallback(
@@ -168,6 +200,11 @@ export function App({
             onSubmit={handleFeatureSelect}
             onBack={() => goToStep('template-select')}
           />
+        );
+
+      case 'test-profile-select':
+        return (
+          <TestProfileSelect onSelect={handleTestProfileSelect} onSkip={handleTestProfileSkip} />
         );
 
       case 'package-manager':

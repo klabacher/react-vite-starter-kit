@@ -20,6 +20,7 @@ const featureOrder: FeatureKey[] = [
   'husky',
   'githubActions',
   'vscode',
+  'testing',
 ];
 
 export function FeatureSelect({
@@ -78,7 +79,7 @@ export function FeatureSelect({
             <Text color={isSelected ? 'cyan' : undefined}>
               {isSelected ? '❯ ' : '  '}
               <Text color={isEnabled ? 'green' : 'gray'}>{isEnabled ? '◉' : '○'}</Text>{' '}
-              <Text>{desc.icon}</Text> <Text bold={isEnabled}>{desc.name}</Text>
+              <Text>{desc.icon}</Text> <Text bold={!!isEnabled}>{desc.name}</Text>
               <Text dimColor> - {desc.description}</Text>
             </Text>
           </Box>

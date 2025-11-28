@@ -1,6 +1,24 @@
 // Package manager types
 export type PackageManager = 'npm' | 'yarn' | 'pnpm';
 
+// Test profile options for configurable testing setup
+export type TestProfile = 'bare' | 'minimum' | 'standard' | 'advanced' | 'complete';
+
+// Test profile configuration
+export interface TestProfileConfig {
+  name: string;
+  description: string;
+  coverageThreshold: number;
+  includeTests: {
+    unit: boolean; // Basic unit tests
+    integration: boolean; // Redux/Router integration tests
+    a11y: boolean; // Accessibility tests
+    performance: boolean; // Performance tests
+    snapshot: boolean; // Snapshot tests
+  };
+  dependencies: string[];
+}
+
 // Feature flags for modular template composition
 export interface FeatureFlags {
   typescript: boolean;
@@ -13,6 +31,7 @@ export interface FeatureFlags {
   githubActions: boolean;
   vscode: boolean;
   testing: boolean;
+  testProfile?: TestProfile;
 }
 
 // Base packages always included
@@ -84,6 +103,7 @@ export type WizardStep =
   | 'project-name'
   | 'template-select'
   | 'feature-select'
+  | 'test-profile-select'
   | 'package-manager'
   | 'git-init'
   | 'summary'

@@ -1,0 +1,193 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { screen, waitFor, within } from '@testing-library/react';
+import { renderApp, userEvent } from './test-utils';
+{{#if redux}}
+import { Provider } from 'react-redux';
+import { store } from '../Redux/Store';
+import { increment, decrement, reset } from '../Redux/Slice';
+{{/if}}
+{{#if reactRouter}}
+import { Routes, Route, Link } from 'react-router-dom';
+{{/if}}
+
+// Integration test component
+function Counter() {
+  {{#if redux}}
+  const count = useSelector((state: any) => state.counter.value);
+  const dispatch = useDispatch();
+  
+  return (
+    <div>
+      <span data-testid="count">{count}</span>
+      <button onClick={() => dispatch(increment())} data-testid="increment">+</button>
+      <button onClick={() => dispatch(decrement())} data-testid="decrement">-</button>
+      <button onClick={() => dispatch(reset())} data-testid="reset">Reset</button>
+    </div>
+  );
+  {{else}}
+  const [count, setCount] = React.useState(0);
+  
+  return (
+    <div>
+      <span data-testid="count">{count}</span>
+      <button onClick={() => setCount(c => c + 1)} data-testid="increment">+</button>
+      <button onClick={() => setCount(c => c - 1)} data-testid="decrement">-</button>
+      <button onClick={() => setCount(0)} data-testid="reset">Reset</button>
+    </div>
+  );
+  {{/if}}
+}
+
+{{#if redux}}
+import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
+
+describe('Redux Integration', () => {
+  beforeEach(() => {
+    store.dispatch(reset());
+  });
+
+  describe('Counter Component with Redux', () => {
+    it('should display initial count', () => {
+      renderApp(<Counter />);
+      expect(screen.getByTestId('count')).toHaveTextContent('0');
+    });
+
+    it('should increment count on button click', async () => {
+      const user = userEvent.setup();
+      renderApp(<Counter />);
+      
+      await user.click(screen.getByTestId('increment'));
+      expect(screen.getByTestId('count')).toHaveTextContent('1');
+    });
+
+    it('should decrement count on button click', async () => {
+      const user = userEvent.setup();
+      store.dispatch(increment());
+      store.dispatch(increment());
+      renderApp(<Counter />);
+      
+      await user.click(screen.getByTestId('decrement'));
+      expect(screen.getByTestId('count')).toHaveTextContent('1');
+    });
+
+    it('should reset count', async () => {
+      const user = userEvent.setup();
+      store.dispatch(increment());
+      store.dispatch(increment());
+      store.dispatch(increment());
+      renderApp(<Counter />);
+      
+      await user.click(screen.getByTestId('reset'));
+      expect(screen.getByTestId('count')).toHaveTextContent('0');
+    });
+
+    it('should handle rapid clicks', async () => {
+      const user = userEvent.setup();
+      renderApp(<Counter />);
+      
+      const incrementBtn = screen.getByTestId('increment');
+      await user.click(incrementBtn);
+      await user.click(incrementBtn);
+      await user.click(incrementBtn);
+      await user.click(incrementBtn);
+      await user.click(incrementBtn);
+      
+      expect(screen.getByTestId('count')).toHaveTextContent('5');
+    });
+  });
+
+  {{#if reactRouter}}
+  describe('Redux with Router Integration', () => {
+    function CounterPage() {
+      return (
+        <div>
+          <h1>Counter Page</h1>
+          <Counter />
+          <Link to="/other" data-testid="other-link">Go to Other</Link>
+        </div>
+      );
+    }
+
+    function OtherPage() {
+      return (
+        <div>
+          <h1>Other Page</h1>
+          <Link to="/" data-testid="counter-link">Go to Counter</Link>
+        </div>
+      );
+    }
+
+    function AppWithRouter() {
+      return (
+        <Routes>
+          <Route path="/" element={<CounterPage />} />
+          <Route path="/other" element={<OtherPage />} />
+        </Routes>
+      );
+    }
+
+    it('should persist Redux state across navigation', async () => {
+      const user = userEvent.setup();
+      renderApp(<AppWithRouter />, { route: '/' });
+      
+      // Increment counter
+      await user.click(screen.getByTestId('increment'));
+      await user.click(screen.getByTestId('increment'));
+      expect(screen.getByTestId('count')).toHaveTextContent('2');
+      
+      // Navigate away
+      await user.click(screen.getByTestId('other-link'));
+      await waitFor(() => {
+        expect(screen.queryByTestId('count')).not.toBeInTheDocument();
+      });
+      
+      // Navigate back
+      await user.click(screen.getByTestId('counter-link'));
+      await waitFor(() => {
+        expect(screen.getByTestId('count')).toHaveTextContent('2');
+      });
+    });
+  });
+  {{/if}}
+});
+{{else}}
+import React from 'react';
+
+describe('Component Integration', () => {
+  describe('Counter Component', () => {
+    it('should display initial count', () => {
+      renderApp(<Counter />);
+      expect(screen.getByTestId('count')).toHaveTextContent('0');
+    });
+
+    it('should increment count on button click', async () => {
+      const user = userEvent.setup();
+      renderApp(<Counter />);
+      
+      await user.click(screen.getByTestId('increment'));
+      expect(screen.getByTestId('count')).toHaveTextContent('1');
+    });
+
+    it('should decrement count on button click', async () => {
+      const user = userEvent.setup();
+      renderApp(<Counter />);
+      
+      await user.click(screen.getByTestId('increment'));
+      await user.click(screen.getByTestId('increment'));
+      await user.click(screen.getByTestId('decrement'));
+      expect(screen.getByTestId('count')).toHaveTextContent('1');
+    });
+
+    it('should reset count', async () => {
+      const user = userEvent.setup();
+      renderApp(<Counter />);
+      
+      await user.click(screen.getByTestId('increment'));
+      await user.click(screen.getByTestId('increment'));
+      await user.click(screen.getByTestId('reset'));
+      expect(screen.getByTestId('count')).toHaveTextContent('0');
+    });
+  });
+});
+{{/if}}

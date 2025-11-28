@@ -103,15 +103,38 @@ describe('generateDependencies', () => {
 
   describe('with testing', () => {
     it('should include vitest and testing library dependencies', () => {
+      // With standard profile (default), @vitest/ui is not included
       const { devDependencies } = generateDependencies(createFeatures({ testing: true }));
 
       expect(devDependencies).toHaveProperty('vitest');
       expect(devDependencies).toHaveProperty('@vitest/coverage-v8');
-      expect(devDependencies).toHaveProperty('@vitest/ui');
       expect(devDependencies).toHaveProperty('@testing-library/react');
       expect(devDependencies).toHaveProperty('@testing-library/jest-dom');
       expect(devDependencies).toHaveProperty('@testing-library/user-event');
       expect(devDependencies).toHaveProperty('jsdom');
+    });
+
+    it('should include @vitest/ui with advanced profile', () => {
+      const { devDependencies } = generateDependencies(
+        createFeatures({ testing: true, testProfile: 'advanced' })
+      );
+
+      expect(devDependencies).toHaveProperty('@vitest/ui');
+      expect(devDependencies).toHaveProperty('jest-axe');
+    });
+
+    it('should include minimal dependencies with bare profile', () => {
+      const { devDependencies } = generateDependencies(
+        createFeatures({ testing: true, testProfile: 'bare' })
+      );
+
+      expect(devDependencies).toHaveProperty('vitest');
+      expect(devDependencies).toHaveProperty('jsdom');
+      expect(devDependencies).toHaveProperty('@testing-library/react');
+      expect(devDependencies).toHaveProperty('@testing-library/jest-dom');
+      // Should not have coverage or ui in bare profile
+      expect(devDependencies).not.toHaveProperty('@vitest/coverage-v8');
+      expect(devDependencies).not.toHaveProperty('@vitest/ui');
     });
   });
 

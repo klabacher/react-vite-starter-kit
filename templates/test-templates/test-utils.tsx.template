@@ -1,0 +1,62 @@
+import React, { ReactElement, ReactNode } from 'react';
+import { render, RenderOptions, RenderResult } from '@testing-library/react';
+{{#if redux}}
+import { Provider } from 'react-redux';
+import { store } from '../Redux/Store';
+{{/if}}
+{{#if reactRouter}}
+import { MemoryRouter } from 'react-router-dom';
+{{/if}}
+
+interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
+  route?: string;
+}
+
+interface WrapperProps {
+  children: ReactNode;
+  route?: string;
+}
+
+function AllProviders({ children, route = '/' }: WrapperProps) {
+  {{#if redux}}
+  {{#if reactRouter}}
+  return (
+    <Provider store={store}>
+      <MemoryRouter initialEntries={[route]}>
+        {children}
+      </MemoryRouter>
+    </Provider>
+  );
+  {{else}}
+  return <Provider store={store}>{children}</Provider>;
+  {{/if}}
+  {{else}}
+  {{#if reactRouter}}
+  return <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>;
+  {{else}}
+  return <>{children}</>;
+  {{/if}}
+  {{/if}}
+}
+
+export function renderApp(
+  ui: ReactElement,
+  options: CustomRenderOptions = {}
+): RenderResult & { route: string } {
+  const { route = '/', ...renderOptions } = options;
+
+  const result = render(ui, {
+    wrapper: ({ children }) => <AllProviders route={route}>{children}</AllProviders>,
+    ...renderOptions,
+  });
+
+  return {
+    ...result,
+    route,
+    rerender: (newUi: ReactElement) =>
+      result.rerender(<AllProviders route={route}>{newUi}</AllProviders>),
+  };
+}
+
+export * from '@testing-library/react';
+export { default as userEvent } from '@testing-library/user-event';
