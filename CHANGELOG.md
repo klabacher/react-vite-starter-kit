@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.5] - 2025-11-29
 
+### Added
+
+- **Headless mode** for CI/non-TTY environments - Automatically detects when running in GitHub Actions, CI, or without a TTY and runs project creation without the interactive Ink UI
+
 ### Changed
 
 - **Minimum Node.js version** bumped from 18.x to 20.x due to `string-width` dependency (used by Ink) requiring the RegExp `v` flag only available in Node.js 20+
@@ -15,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **GitHub Actions build failure** - Fixed `SyntaxError: Invalid regular expression flags` error on Node.js 18.x caused by `string-width` package using unsupported RegExp `v` flag
+- **GitHub Actions template tests** - Fixed `Raw mode is not supported` error when running CLI in non-interactive CI environments by auto-detecting and using headless mode
 
 ## [0.0.4] - 2025-11-28
 
