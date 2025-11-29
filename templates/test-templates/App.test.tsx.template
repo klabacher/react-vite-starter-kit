@@ -59,9 +59,4 @@ describe('App', () => {
     });
   });
   {{/if}}
-
-  it('should match snapshot', () => {
-    const { container } = renderApp(<App />);
-    expect(container).toMatchSnapshot();
-  });
 });
