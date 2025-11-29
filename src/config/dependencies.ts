@@ -55,6 +55,14 @@ const featureDependencies: Record<
       'react-router-dom': '^7.9.6',
     },
   },
+  i18n: {
+    deps: {
+      'react-i18next': '^15.4.1',
+      i18next: '^24.2.3',
+      'i18next-browser-languagedetector': '^8.0.4',
+      'i18next-http-backend': '^3.0.2',
+    },
+  },
   eslint: {
     devDeps: {
       eslint: '^9.39.1',
@@ -98,6 +106,10 @@ export function generateDependencies(features: FeatureFlags): DependencyVersions
 
   if (features.reactRouter) {
     Object.assign(dependencies, featureDependencies.reactRouter.deps);
+  }
+
+  if (features.i18n) {
+    Object.assign(dependencies, featureDependencies.i18n.deps);
   }
 
   if (features.eslint) {

@@ -25,6 +25,7 @@ export interface FeatureFlags {
   tailwindcss: boolean;
   redux: boolean;
   reactRouter: boolean;
+  i18n: boolean; // react-i18next internationalization
   eslint: boolean;
   prettier: boolean;
   husky: boolean;
@@ -32,6 +33,69 @@ export interface FeatureFlags {
   vscode: boolean;
   testing: boolean;
   testProfile?: TestProfile;
+}
+
+// ============================================================================
+// DYNAMIC TEMPLATE SYSTEM TYPES
+// ============================================================================
+
+// Technology icons for showcase display
+export interface TechIcon {
+  name: string;
+  logo: string; // SVG filename or inline SVG
+  url: string;
+  color: string;
+}
+
+// Feature card configuration for showcase App
+export interface FeatureCard {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  feature: keyof FeatureFlags; // Which feature flag enables this card
+}
+
+// Component registry for dynamic composition
+export interface ComponentRegistry {
+  providers: ProviderConfig[];
+  cards: FeatureCard[];
+  icons: TechIcon[];
+}
+
+// Provider wrapper configuration (for main.tsx)
+export interface ProviderConfig {
+  name: string;
+  feature: keyof FeatureFlags;
+  importStatement: string;
+  wrapperStart: string;
+  wrapperEnd: string;
+  order: number; // Lower = outer wrapper (i18n=1, redux=2, router=3)
+}
+
+// Translation keys structure for i18n
+export interface TranslationKeys {
+  hero: {
+    title: string;
+    subtitle: string;
+  };
+  features: {
+    counter: { title: string; description: string };
+    redux: { title: string; description: string };
+    router: { title: string; description: string };
+    i18n: { title: string; description: string };
+  };
+  footer: {
+    madeWith: string;
+    by: string;
+  };
+  common: {
+    increment: string;
+    lightMode: string;
+    darkMode: string;
+    language: string;
+  };
 }
 
 // Base packages always included

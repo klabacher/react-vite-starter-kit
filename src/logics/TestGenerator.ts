@@ -84,6 +84,7 @@ export class TestGenerator {
       typescript: this.features.typescript,
       eslint: this.features.eslint,
       prettier: this.features.prettier,
+      i18n: this.features.i18n || false,
       custom: this.isCustomSetup(),
     };
     return featureMap[feature] ?? false;
@@ -223,6 +224,19 @@ export class TestGenerator {
   }
 
   /**
+   * Generate i18n tests content
+   */
+  generateI18nTest(): string {
+    if (!this.features.i18n || !this.profile.includeTests.unit) return '';
+
+    const template = this.readTemplate('i18n.test.tsx.template');
+    if (template) {
+      return this.processTemplate(template);
+    }
+    return '';
+  }
+
+  /**
    * Generate vitest.config.ts content
    */
   generateVitestConfig(): string {
@@ -283,6 +297,12 @@ export class TestGenerator {
     const tailwindTest = this.generateTailwindTest();
     if (tailwindTest) {
       files.push({ filename: 'tailwind.test.tsx', content: tailwindTest });
+    }
+
+    // i18n test
+    const i18nTest = this.generateI18nTest();
+    if (i18nTest) {
+      files.push({ filename: 'i18n.test.tsx', content: i18nTest });
     }
 
     return files.filter(f => f.content.trim().length > 0);

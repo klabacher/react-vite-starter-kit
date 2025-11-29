@@ -6,6 +6,7 @@ const defaultFeatures: FeatureFlags = {
   tailwindcss: false,
   redux: false,
   reactRouter: false,
+  i18n: false,
   eslint: false,
   prettier: false,
   husky: false,
@@ -43,7 +44,7 @@ export const templates: Template[] = [
     id: 'full-pack',
     name: 'Full Pack',
     description:
-      'Everything included: Redux, React Router, TailwindCSS, Linting, Husky, CI/CD, Testing',
+      'Everything included: Redux, React Router, i18n, TailwindCSS, Linting, Husky, CI/CD, Testing',
     icon: '🚀',
     color: 'magenta',
     features: {
@@ -51,6 +52,7 @@ export const templates: Template[] = [
       tailwindcss: true,
       redux: true,
       reactRouter: true,
+      i18n: true,
       eslint: true,
       prettier: true,
       husky: true,
@@ -95,6 +97,11 @@ export const featureDescriptions: Record<
     name: 'React Router',
     description: 'Declarative routing for React applications',
     icon: '🛣️',
+  },
+  i18n: {
+    name: 'react-i18next',
+    description: 'Internationalization with language detection and translations',
+    icon: '🌐',
   },
   eslint: {
     name: 'ESLint',

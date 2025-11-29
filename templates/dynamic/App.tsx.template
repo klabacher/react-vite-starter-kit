@@ -1,0 +1,664 @@
+{{!-- Dynamic Showcase App Template --}}
+{{!-- This template generates a beautiful, responsive app based on selected features --}}
+
+import './App.css';
+import { useState, useEffect } from 'react';
+{{#if features.redux}}
+import { useSelector, useDispatch } from 'react-redux';
+import { selectTheme, toggleTheme } from './store/slices/appSlice';
+{{/if}}
+{{#if features.reactRouter}}
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
+{{/if}}
+{{#if features.i18n}}
+import { useTranslation } from 'react-i18next';
+{{/if}}
+
+{{!-- Tech Logo Imports --}}
+{{#if features.tailwindcss}}
+// Tech logos as inline SVGs for the showcase
+const ReactLogo = () => (
+  <svg viewBox="0 0 24 24" className="w-12 h-12 text-[#61DAFB]" fill="currentColor">
+    <path d="M12 9.861a2.139 2.139 0 100 4.278 2.139 2.139 0 000-4.278zm-5.992 6.394l-.472-.12C2.018 15.246 0 13.737 0 11.996s2.018-3.25 5.536-4.139l.472-.119.133.468a23.53 23.53 0 001.363 3.578l.101.213-.101.213a23.307 23.307 0 00-1.363 3.578l-.133.467zM5.317 8.95c-2.674.751-4.315 1.9-4.315 3.046 0 1.145 1.641 2.294 4.315 3.046a24.95 24.95 0 011.182-3.046A24.752 24.752 0 015.317 8.95zm12.675 7.305l-.133-.469a23.357 23.357 0 00-1.364-3.577l-.101-.213.101-.213a23.42 23.42 0 001.364-3.578l.133-.468.473.119c3.517.889 5.535 2.398 5.535 4.14s-2.018 3.25-5.535 4.139l-.473.12zm-.491-4.259c.48 1.039.877 2.06 1.182 3.046 2.675-.752 4.315-1.901 4.315-3.046 0-1.146-1.641-2.294-4.315-3.046a24.788 24.788 0 01-1.182 3.046zM5.31 8.945l-.133-.467C4.188 4.992 4.488 2.494 6 1.622c1.483-.856 3.864.155 6.359 2.716l.34.349-.34.349a23.552 23.552 0 00-2.422 2.967l-.135.193-.235.02a23.657 23.657 0 00-3.785.61l-.472.119zm1.896-6.63c-.268 0-.505.058-.705.173-.994.573-1.17 2.565-.485 5.253a25.122 25.122 0 013.233-.501 24.847 24.847 0 012.052-2.544c-1.56-1.519-3.037-2.381-4.095-2.381zm9.589 20.362c-.001 0-.001 0 0 0-1.425 0-3.255-1.073-5.154-3.023l-.34-.349.34-.349a23.53 23.53 0 002.421-2.968l.135-.193.234-.02a23.63 23.63 0 003.787-.609l.472-.119.134.468c.987 3.484.688 5.983-.824 6.854a2.38 2.38 0 01-1.205.308zm-4.096-3.381c1.56 1.519 3.037 2.381 4.095 2.381h.001c.267 0 .505-.058.704-.173.994-.573 1.171-2.566.485-5.254a25.02 25.02 0 01-3.234.501 24.674 24.674 0 01-2.051 2.545zM18.69 8.945l-.472-.119a23.479 23.479 0 00-3.787-.61l-.234-.02-.135-.193a23.414 23.414 0 00-2.421-2.967l-.34-.349.34-.349C14.135 1.778 16.515.767 18 1.622c1.512.872 1.812 3.37.824 6.855l-.134.468zM14.75 7.24c1.142.104 2.227.273 3.234.501.686-2.688.509-4.68-.485-5.253-.988-.571-2.845.304-4.8 2.208A24.849 24.849 0 0114.75 7.24zM7.206 22.677A2.38 2.38 0 016 22.369c-1.512-.871-1.812-3.369-.823-6.854l.132-.468.472.119c1.155.291 2.429.496 3.785.609l.235.02.134.193a23.596 23.596 0 002.422 2.968l.34.349-.34.349c-1.898 1.95-3.728 3.023-5.151 3.023zm-1.19-6.427c-.686 2.688-.509 4.681.485 5.254.987.563 2.843-.305 4.8-2.208a24.998 24.998 0 01-2.052-2.545 24.976 24.976 0 01-3.233-.501zm5.984.628c-.823 0-1.669-.036-2.516-.106l-.235-.02-.135-.193a30.388 30.388 0 01-1.35-2.122 30.354 30.354 0 01-1.166-2.228l-.1-.213.1-.213a30.3 30.3 0 011.166-2.228c.414-.716.869-1.43 1.35-2.122l.135-.193.235-.02a29.785 29.785 0 015.033 0l.234.02.134.193a30.006 30.006 0 012.517 4.35l.101.213-.101.213a29.6 29.6 0 01-2.517 4.35l-.134.193-.234.02c-.847.07-1.694.106-2.517.106zm-2.197-1.084c1.48.111 2.914.111 4.395 0a29.006 29.006 0 002.196-3.798 28.585 28.585 0 00-2.197-3.798 29.031 29.031 0 00-4.394 0 28.477 28.477 0 00-2.197 3.798 29.114 29.114 0 002.197 3.798z"/>
+  </svg>
+);
+
+const ViteLogo = () => (
+  <svg viewBox="0 0 256 257" className="w-12 h-12">
+    <defs>
+      <linearGradient id="viteGrad1" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%">
+        <stop offset="0%" stopColor="#41D1FF"/>
+        <stop offset="100%" stopColor="#BD34FE"/>
+      </linearGradient>
+      <linearGradient id="viteGrad2" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%">
+        <stop offset="0%" stopColor="#FFBD4F"/>
+        <stop offset="100%" stopColor="#FF980E"/>
+      </linearGradient>
+    </defs>
+    <path fill="url(#viteGrad1)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 002.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62z" transform="scale(.1)"/>
+    <path fill="url(#viteGrad2)" d="M185.432.063L96.44 17.501a3.268 3.268 0 00-2.634 3.014l-5.474 92.456a3.268 3.268 0 003.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028 72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113z" transform="scale(.1)"/>
+  </svg>
+);
+
+const TypeScriptLogo = () => (
+  <svg viewBox="0 0 256 256" className="w-10 h-10">
+    <rect width="256" height="256" rx="20" fill="#3178C6"/>
+    <path fill="#fff" d="M150.518 200.475v27.62c4.492 2.302 9.805 4.028 15.938 5.179 6.133 1.151 12.597 1.726 19.393 1.726 6.622 0 12.914-.633 18.874-1.899 5.96-1.266 11.187-3.352 15.678-6.257 4.492-2.906 8.048-6.704 10.669-11.394 2.62-4.689 3.93-10.486 3.93-17.391 0-5.006-.749-9.394-2.246-13.163-1.497-3.769-3.638-7.166-6.422-10.191-2.784-3.025-6.145-5.823-10.083-8.394-3.938-2.571-8.318-5.006-13.14-7.306-3.511-1.727-6.622-3.378-9.333-4.953-2.711-1.576-4.996-3.128-6.854-4.659-1.858-1.53-3.27-3.128-4.236-4.793-.966-1.664-1.449-3.487-1.449-5.468 0-1.849.414-3.533 1.241-5.053.828-1.52 2.03-2.847 3.605-3.981 1.576-1.134 3.511-2.014 5.806-2.64 2.295-.627 4.921-.94 7.878-.94 2.073 0 4.259.182 6.557.547 2.299.364 4.61.918 6.933 1.66 2.323.742 4.564 1.665 6.724 2.769 2.16 1.104 4.135 2.378 5.927 3.821v-25.791c-3.938-1.576-8.272-2.725-13-3.448-4.729-.723-10.161-1.084-16.296-1.084-6.577 0-12.798.69-18.664 2.072-5.866 1.382-11.03 3.511-15.49 6.39-4.461 2.878-7.985 6.577-10.573 11.095-2.587 4.519-3.881 9.938-3.881 16.258 0 8.271 2.426 15.333 7.277 21.186 4.852 5.852 12.151 10.756 21.898 14.711 3.858 1.576 7.403 3.128 10.635 4.659 3.231 1.53 6.007 3.128 8.326 4.793 2.32 1.664 4.135 3.487 5.447 5.468 1.312 1.981 1.968 4.22 1.968 6.717 0 1.713-.368 3.304-1.104 4.774-.736 1.47-1.858 2.759-3.365 3.867-1.508 1.108-3.421 1.974-5.739 2.598-2.319.625-5.026.937-8.123.937-5.435 0-10.984-1.04-16.647-3.119-5.663-2.079-10.892-5.179-15.686-9.3zM100.593 141.063H66.158v83.411H38.307v-83.411H0v-22.578h100.593v22.578z"/>
+  </svg>
+);
+{{/if}}
+
+{{#if features.redux}}
+const ReduxLogo = () => (
+  <svg viewBox="0 0 256 244" className="w-10 h-10">
+    <path fill="#764ABC" d="M177.381 169.733c9.447-.978 16.614-9.122 16.288-18.896-.325-9.773-8.47-17.592-18.243-17.592h-.651c-10.1.326-17.918 8.796-17.592 18.895.326 4.887 2.28 9.122 5.212 12.054-11.076 21.828-28.016 37.791-53.426 51.148-17.266 9.122-35.183 12.38-53.1 10.1-14.66-1.955-26.062-8.47-33.23-19.222-10.424-15.963-11.401-33.23-2.605-50.496 6.19-12.38 15.963-21.502 22.153-26.062-1.303-4.235-3.258-11.402-4.235-16.614-47.237 34.207-42.35 80.468-28.016 102.295 10.75 16.29 32.577 26.389 56.684 26.389 6.515 0 13.03-.652 19.546-2.28 41.699-8.145 73.299-32.905 91.216-69.718zm57.336-40.397c-24.759-28.995-61.245-44.958-102.944-44.958h-5.212c-2.932-5.864-9.122-9.774-15.963-9.774h-.652C99.848 74.93 92.03 83.4 92.355 93.5c.326 9.773 8.47 17.592 18.244 17.592h.651c7.167-.326 13.357-4.561 15.963-10.425h5.864c24.759 0 48.214 7.167 69.39 21.176 16.288 10.751 28.016 24.76 34.531 41.7 5.538 13.682 5.212 27.039-.652 38.44-9.122 17.266-24.433 26.715-44.63 26.715-13.03 0-25.41-3.91-31.926-6.842-3.583 3.258-10.099 8.796-14.66 12.055 14.009 6.515 28.343 10.099 42.025 10.099 31.274 0 54.404-17.267 63.2-34.533 9.447-18.896 8.795-51.474-15.637-79.165zM69.225 175.27c.326 9.774 8.47 17.592 18.243 17.592h.652c10.1-.325 17.917-8.796 17.591-18.895-.325-9.774-8.47-17.592-18.243-17.592h-.651c-.652 0-1.63 0-2.28.325-13.357-22.153-18.895-46.26-16.94-72.323 1.302-19.547 7.818-36.488 19.22-50.497 9.448-12.054 27.69-17.918 40.07-18.243 34.532-.652 49.193 42.351 50.17 59.617 4.236.978 11.402 3.258 16.289 4.887C189.435 27.593 156.857 0 124.604 0 94.308 0 66.292 24.009 56.52 59.617c-13.683 47.889-1.955 93.825 17.266 130.313-1.628 2.606-2.606 5.864-2.28 9.448z"/>
+  </svg>
+);
+{{/if}}
+
+{{#if features.tailwindcss}}
+const TailwindLogo = () => (
+  <svg viewBox="0 0 256 154" className="w-12 h-10">
+    <defs>
+      <linearGradient id="tailwindGrad" x1="-2.778%" x2="100%" y1="32%" y2="67.556%">
+        <stop offset="0%" stopColor="#2298BD"/>
+        <stop offset="100%" stopColor="#0ED7B5"/>
+      </linearGradient>
+    </defs>
+    <path fill="url(#tailwindGrad)" d="M128 0Q76.8 0 64 51.2q19.2-25.6 44.8-19.2c14.65 3.67 25.13 14.27 36.72 26 18.86 19.1 40.69 41.2 88.48 41.2q51.2 0 64-51.2-19.2 25.6-44.8 19.2c-14.65-3.67-25.13-14.27-36.72-26C197.62 22.1 175.79 0 128 0zM64 76.8q-51.2 0-64 51.2 19.2-25.6 44.8-19.2c14.65 3.67 25.13 14.27 36.72 26 18.86 19.1 40.69 41.2 88.48 41.2q51.2 0 64-51.2-19.2 25.6-44.8 19.2c-14.65-3.67-25.13-14.27-36.72-26C133.62 98.9 111.79 76.8 64 76.8z"/>
+  </svg>
+);
+{{/if}}
+
+{{#if features.reactRouter}}
+const RouterLogo = () => (
+  <svg viewBox="0 0 256 256" className="w-10 h-10">
+    <rect fill="#F44250" width="256" height="256" rx="45"/>
+    <path fill="#fff" d="M196.3 169.1c3.8-5.2 7.2-10.7 10.1-16.5h-52.8c-.8 0-1.6-.1-2.4-.2l-2.7 10.9c-.8 3.2-2.1 6.1-3.9 8.8 18.3 5.4 37.5 3.3 51.7-3zm-112.4 21c9.2 10 21.9 15.9 35.8 15.9 3.9 0 7.7-.5 11.4-1.4l6.9-27.6c-15.3-5.1-32-4.4-46.6 2.1-2.7 1.2-5.2 2.6-7.5 4.2v6.8zm122-85.5c-2.3-3.5-5-6.7-8-9.6l-50.5 12.3c.4.8.7 1.7.9 2.6l33.9 4.2c1.7.2 3.3.6 4.9 1.2l18.8-10.7zm-97.6 53.5c1.7 0 3.4-.1 5-.4l14-56.1-5.7-1.4c-1.4-.4-2.9-.5-4.4-.5H85.6c-2 4.9-3.6 10.1-4.7 15.4h30.2c8.4 0 15.2 6.8 15.2 15.2s-6.8 15.2-15.2 15.2H77.7c.6 4.5 1.6 8.9 3 13.1l27.6-.5zm31.2-93.6c-9.3.8-18.2 3.3-26.4 7.4v9.9l31.3 7.8 8-32.2c-4.3 2.2-8.6 4.6-12.9 7.1z"/>
+  </svg>
+);
+{{/if}}
+
+{{#if features.i18n}}
+{{!-- Language selector component --}}
+function LanguageSelector({ isDark }: { isDark: boolean }) {
+  const { i18n, t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'pt', name: 'Português', flag: '🇧🇷' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+  ];
+
+  const currentLang = languages.find(l => l.code === i18n.language) || languages[0];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 cursor-pointer ${
+          isDark
+            ? 'bg-gray-800/50 hover:bg-gray-700/50 text-white'
+            : 'bg-white/80 hover:bg-white shadow-md text-gray-900'
+        }`}
+      >
+        <span className="text-xl">{currentLang.flag}</span>
+        <span className="font-medium">{currentLang.name}</span>
+        <svg className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className={`absolute top-full mt-2 right-0 rounded-xl overflow-hidden shadow-xl z-50 ${
+          isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+        }`}>
+          {languages.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => {
+                i18n.changeLanguage(lang.code);
+                setIsOpen(false);
+              }}
+              className={`flex items-center gap-3 w-full px-4 py-3 transition-colors cursor-pointer ${
+                lang.code === i18n.language
+                  ? isDark ? 'bg-blue-600/20 text-blue-400' : 'bg-blue-50 text-blue-600'
+                  : isDark ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+              }`}
+            >
+              <span className="text-xl">{lang.flag}</span>
+              <span className="font-medium">{lang.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+{{/if}}
+
+{{#if features.reactRouter}}
+{{!-- Page components for router --}}
+function HomePage({ isDark }: { isDark: boolean }) {
+{{#if features.i18n}}
+  const { t } = useTranslation();
+{{/if}}
+  const [count, setCount] = useState(0);
+  const [autoCount, setAutoCount] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (isRunning) {
+      interval = setInterval(() => {
+        setAutoCount((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isRunning]);
+
+  return (
+    <>
+      {/* Showcases Grid */}
+      <section className="grid md:grid-cols-2 gap-8 mb-16">
+        {/* useState Showcase */}
+        <div className={`p-8 rounded-3xl transition-all duration-300 ${
+          isDark
+            ? 'bg-gray-800/50 border border-gray-700/50'
+            : 'bg-white shadow-xl border border-gray-100'
+        }`}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-blue-500/20 rounded-xl">
+              <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold">{{#if features.i18n}}{t('features.counter.title')}{{else}}useState Hook{{/if}}</h3>
+          </div>
+          <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            {{#if features.i18n}}{t('features.counter.description')}{{else}}Click the button to increment the counter{{/if}}
+          </p>
+          <div className="text-center">
+            <div className={`text-6xl font-bold mb-6 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+              {count}
+            </div>
+            <button
+              onClick={() => setCount((c) => c + 1)}
+              className="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-full hover:from-blue-600 hover:to-blue-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/25 cursor-pointer"
+            >
+              {{#if features.i18n}}{t('common.increment')}{{else}}Increment{{/if}}
+            </button>
+          </div>
+        </div>
+
+        {/* useEffect Showcase */}
+        <div className={`p-8 rounded-3xl transition-all duration-300 ${
+          isDark
+            ? 'bg-gray-800/50 border border-gray-700/50'
+            : 'bg-white shadow-xl border border-gray-100'
+        }`}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-purple-500/20 rounded-xl">
+              <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold">{{#if features.i18n}}{t('features.timer.title')}{{else}}useEffect Hook{{/if}}</h3>
+          </div>
+          <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            {{#if features.i18n}}{t('features.timer.description')}{{else}}Auto-incrementing timer using useEffect{{/if}}
+          </p>
+          <div className="text-center">
+            <div className={`text-6xl font-bold mb-6 font-mono ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>
+              {String(Math.floor(autoCount / 60)).padStart(2, '0')}:{String(autoCount % 60).padStart(2, '0')}
+            </div>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setIsRunning(!isRunning)}
+                className={`px-6 py-3 font-semibold rounded-full transition-all duration-300 hover:scale-105 shadow-lg cursor-pointer ${
+                  isRunning
+                    ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white hover:shadow-red-500/25'
+                    : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-green-500/25'
+                }`}
+              >
+                {isRunning ? {{#if features.i18n}}t('common.stop'){{else}}'Stop'{{/if}} : {{#if features.i18n}}t('common.start'){{else}}'Start'{{/if}}}
+              </button>
+              <button
+                onClick={() => setAutoCount(0)}
+                className={`px-6 py-3 font-semibold rounded-full transition-all duration-300 hover:scale-105 cursor-pointer ${
+                  isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                }`}
+              >
+                {{#if features.i18n}}{t('common.reset')}{{else}}Reset{{/if}}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function AboutPage({ isDark }: { isDark: boolean }) {
+{{#if features.i18n}}
+  const { t } = useTranslation();
+{{/if}}
+  return (
+    <div className={`p-8 rounded-3xl ${
+      isDark ? 'bg-gray-800/50 border border-gray-700/50' : 'bg-white shadow-xl border border-gray-100'
+    }`}>
+      <h2 className="text-3xl font-bold mb-4">{{#if features.i18n}}{t('pages.about.title')}{{else}}About This Project{{/if}}</h2>
+      <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+        {{#if features.i18n}}{t('pages.about.description')}{{else}}This showcase app was generated by react-vite-starter-kit, demonstrating all the features you selected during setup.{{/if}}
+      </p>
+    </div>
+  );
+}
+{{/if}}
+
+function App() {
+{{#if features.redux}}
+  const dispatch = useDispatch();
+  const theme = useSelector(selectTheme);
+  const isDark = theme === 'dark';
+
+  function handleToggleTheme() {
+    dispatch(toggleTheme());
+  }
+{{else}}
+  const [isDark, setIsDark] = useState(true);
+
+  function handleToggleTheme() {
+    setIsDark(!isDark);
+  }
+{{/if}}
+{{#if features.i18n}}
+  const { t } = useTranslation();
+{{/if}}
+{{#if features.reactRouter}}
+  const location = useLocation();
+{{/if}}
+
+{{#unless features.reactRouter}}
+  const [count, setCount] = useState(0);
+  const [autoCount, setAutoCount] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (isRunning) {
+      interval = setInterval(() => {
+        setAutoCount((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isRunning]);
+{{/unless}}
+
+  return (
+{{#if features.tailwindcss}}
+    <div className={`min-h-screen transition-all duration-500 ${
+      isDark
+        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white'
+        : 'bg-gradient-to-br from-blue-50 via-white to-purple-50 text-gray-900'
+    }`}>
+      {/* Theme Toggle */}
+      <div className="fixed top-6 right-6 z-50 flex items-center gap-3">
+{{#if features.i18n}}
+        <LanguageSelector isDark={isDark} />
+{{/if}}
+        <button
+          onClick={handleToggleTheme}
+          className={`p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 cursor-pointer ${
+            isDark
+              ? 'bg-yellow-400 text-gray-900 hover:bg-yellow-300'
+              : 'bg-gray-800 text-yellow-400 hover:bg-gray-700'
+          }`}
+          aria-label="Toggle theme"
+        >
+          {isDark ? (
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+            </svg>
+          )}
+        </button>
+      </div>
+
+      <div className="container mx-auto px-6 py-16 max-w-5xl">
+        {/* Hero Section */}
+        <header className="text-center mb-16">
+          <h1 className={`text-5xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent ${
+            isDark
+              ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400'
+              : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'
+          }`}>
+            {{#if features.i18n}}{t('hero.title')}{{else}}React + Vite Starter{{/if}}
+          </h1>
+          <p className={`text-xl ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            {{#if features.i18n}}{t('hero.subtitle')}{{else}}A modern, fast, and elegant starting point for your React projects{{/if}}
+          </p>
+        </header>
+
+        {/* Tech Stack Logos */}
+        <section className="mb-16">
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+            <a href="https://react.dev" target="_blank" rel="noopener noreferrer" className="group">
+              <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
+                isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
+              }`}>
+                <ReactLogo />
+              </div>
+            </a>
+
+            <span className={`text-3xl font-light ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>+</span>
+
+            <a href="https://vitejs.dev" target="_blank" rel="noopener noreferrer" className="group">
+              <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
+                isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
+              }`}>
+                <ViteLogo />
+              </div>
+            </a>
+
+            <span className={`text-3xl font-light ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>+</span>
+
+            <a href="https://typescriptlang.org" target="_blank" rel="noopener noreferrer" className="group">
+              <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
+                isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
+              }`}>
+                <TypeScriptLogo />
+              </div>
+            </a>
+
+{{#if features.tailwindcss}}
+            <span className={`text-3xl font-light ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>+</span>
+
+            <a href="https://tailwindcss.com" target="_blank" rel="noopener noreferrer" className="group">
+              <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
+                isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
+              }`}>
+                <TailwindLogo />
+              </div>
+            </a>
+{{/if}}
+
+{{#if features.redux}}
+            <span className={`text-3xl font-light ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>+</span>
+
+            <a href="https://redux-toolkit.js.org" target="_blank" rel="noopener noreferrer" className="group">
+              <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
+                isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
+              }`}>
+                <ReduxLogo />
+              </div>
+            </a>
+{{/if}}
+
+{{#if features.reactRouter}}
+            <span className={`text-3xl font-light ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>+</span>
+
+            <a href="https://reactrouter.com" target="_blank" rel="noopener noreferrer" className="group">
+              <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
+                isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
+              }`}>
+                <RouterLogo />
+              </div>
+            </a>
+{{/if}}
+          </div>
+        </section>
+
+{{#if features.reactRouter}}
+        {/* Navigation */}
+        <nav className="flex justify-center gap-4 mb-12">
+          <Link
+            to="/"
+            className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
+              location.pathname === '/'
+                ? isDark ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+                : isDark ? 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {{#if features.i18n}}{t('common.home')}{{else}}Home{{/if}}
+          </Link>
+          <Link
+            to="/about"
+            className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
+              location.pathname === '/about'
+                ? isDark ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+                : isDark ? 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {{#if features.i18n}}{t('common.about')}{{else}}About{{/if}}
+          </Link>
+        </nav>
+
+        {/* Router Content */}
+        <Routes>
+          <Route path="/" element={<HomePage isDark={isDark} />} />
+          <Route path="/about" element={<AboutPage isDark={isDark} />} />
+        </Routes>
+{{else}}
+        {/* Showcases Grid */}
+        <section className="grid md:grid-cols-2 gap-8 mb-16">
+          {/* useState Showcase */}
+          <div className={`p-8 rounded-3xl transition-all duration-300 ${
+            isDark
+              ? 'bg-gray-800/50 border border-gray-700/50'
+              : 'bg-white shadow-xl border border-gray-100'
+          }`}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-blue-500/20 rounded-xl">
+                <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold">{{#if features.i18n}}{t('features.counter.title')}{{else}}useState Hook{{/if}}</h3>
+            </div>
+            <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              {{#if features.i18n}}{t('features.counter.description')}{{else}}Click the button to increment the counter{{/if}}
+            </p>
+            <div className="text-center">
+              <div className={`text-6xl font-bold mb-6 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+                {count}
+              </div>
+              <button
+                onClick={() => setCount((c) => c + 1)}
+                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-full hover:from-blue-600 hover:to-blue-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/25 cursor-pointer"
+              >
+                {{#if features.i18n}}{t('common.increment')}{{else}}Increment{{/if}}
+              </button>
+            </div>
+          </div>
+
+          {/* useEffect Showcase */}
+          <div className={`p-8 rounded-3xl transition-all duration-300 ${
+            isDark
+              ? 'bg-gray-800/50 border border-gray-700/50'
+              : 'bg-white shadow-xl border border-gray-100'
+          }`}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-purple-500/20 rounded-xl">
+                <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold">{{#if features.i18n}}{t('features.timer.title')}{{else}}useEffect Hook{{/if}}</h3>
+            </div>
+            <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              {{#if features.i18n}}{t('features.timer.description')}{{else}}Auto-incrementing timer using useEffect{{/if}}
+            </p>
+            <div className="text-center">
+              <div className={`text-6xl font-bold mb-6 font-mono ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>
+                {String(Math.floor(autoCount / 60)).padStart(2, '0')}:{String(autoCount % 60).padStart(2, '0')}
+              </div>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => setIsRunning(!isRunning)}
+                  className={`px-6 py-3 font-semibold rounded-full transition-all duration-300 hover:scale-105 shadow-lg cursor-pointer ${
+                    isRunning
+                      ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white hover:shadow-red-500/25'
+                      : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-green-500/25'
+                  }`}
+                >
+                  {isRunning ? {{#if features.i18n}}t('common.stop'){{else}}'Stop'{{/if}} : {{#if features.i18n}}t('common.start'){{else}}'Start'{{/if}}}
+                </button>
+                <button
+                  onClick={() => setAutoCount(0)}
+                  className={`px-6 py-3 font-semibold rounded-full transition-all duration-300 hover:scale-105 cursor-pointer ${
+                    isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                  }`}
+                >
+                  {{#if features.i18n}}{t('common.reset')}{{else}}Reset{{/if}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+{{/if}}
+
+{{#if features.redux}}
+        {/* Redux Theme Selector */}
+        <section className={`p-8 rounded-3xl mb-16 transition-all duration-300 ${
+          isDark
+            ? 'bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/20'
+            : 'bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200'
+        }`}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-purple-500/20 rounded-xl">
+              <ReduxLogo />
+            </div>
+            <h3 className="text-xl font-bold">{{#if features.i18n}}{t('features.redux.title')}{{else}}Redux Theme Selector{{/if}}</h3>
+          </div>
+          <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            {{#if features.i18n}}{t('features.redux.description')}{{else}}Theme state managed by Redux Toolkit{{/if}}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <button
+              onClick={() => theme !== 'light' && handleToggleTheme()}
+              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 cursor-pointer ${
+                theme === 'light'
+                  ? 'bg-white text-gray-900 shadow-lg scale-105'
+                  : isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              ☀️ {{#if features.i18n}}{t('common.lightMode')}{{else}}Light Mode{{/if}}
+            </button>
+            <button
+              onClick={() => theme !== 'dark' && handleToggleTheme()}
+              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 cursor-pointer ${
+                theme === 'dark'
+                  ? 'bg-gray-900 text-white shadow-lg scale-105'
+                  : isDark ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              🌙 {{#if features.i18n}}{t('common.darkMode')}{{else}}Dark Mode{{/if}}
+            </button>
+          </div>
+          <p className={`mt-6 text-center text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+            {{#if features.i18n}}{t('common.currentTheme')}{{else}}Current theme{{/if}}: <code className={`px-2 py-1 rounded ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>{theme}</code>
+          </p>
+        </section>
+{{/if}}
+
+{{#if features.i18n}}
+        {/* i18n Showcase */}
+        <section className={`p-8 rounded-3xl mb-16 transition-all duration-300 ${
+          isDark
+            ? 'bg-gradient-to-r from-green-900/30 to-teal-900/30 border border-green-500/20'
+            : 'bg-gradient-to-r from-green-50 to-teal-50 border border-green-200'
+        }`}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-green-500/20 rounded-xl">
+              <span className="text-2xl">🌐</span>
+            </div>
+            <h3 className="text-xl font-bold">{t('features.i18n.title')}</h3>
+          </div>
+          <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            {t('features.i18n.description')}
+          </p>
+          <div className="flex justify-center">
+            <LanguageSelector isDark={isDark} />
+          </div>
+        </section>
+{{/if}}
+
+        {/* Footer */}
+        <footer className="text-center">
+          <div className={`inline-block px-8 py-6 rounded-2xl ${isDark ? 'bg-gray-800/30' : 'bg-white shadow-lg'}`}>
+            <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+              {{#if features.i18n}}{t('footer.madeWith')}{{else}}Made with ❤️ by{{/if}}
+            </p>
+            <a
+              href="https://github.com/klabacher"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`text-xl font-bold hover:underline ${
+                isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'
+              }`}
+            >
+              João Vitor Klabacher
+            </a>
+            <div className="flex justify-center gap-4 mt-4">
+              <a
+                href="https://github.com/klabacher"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 ${
+                  isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-900 hover:bg-gray-800 text-white'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+                GitHub
+              </a>
+              <a
+                href="https://klabacher.github.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 ${
+                  isDark ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-blue-500 hover:bg-blue-400 text-white'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+                Portfolio
+              </a>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+{{else}}
+    <div className="app-container">
+      <header>
+        <h1 className="title">React + Vite Starter</h1>
+        <p className="subtitle">A modern starting point for your React projects</p>
+      </header>
+
+      <main>
+        <div className="card">
+          <h2>Counter Demo</h2>
+          <div className="counter-display">{count}</div>
+          <button className="btn-primary" onClick={() => setCount((c) => c + 1)}>
+            Increment
+          </button>
+        </div>
+      </main>
+
+      <footer style={{ marginTop: '2rem' }}>
+        <p>Made with ❤️ by <a href="https://github.com/klabacher" style={{ color: '#667eea' }}>João Vitor Klabacher</a></p>
+      </footer>
+    </div>
+{{/if}}
+  );
+}
+
+export default App;

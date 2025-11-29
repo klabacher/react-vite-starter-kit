@@ -1,8 +1,9 @@
 import { readdir } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import type { FeatureFlags } from '../types/index.js';
+import { createTemplateEngine, type TemplateContext } from './TemplateEngine.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -23,6 +24,12 @@ function getTemplatesDir(): string {
   }
 
   return possiblePaths[0]; // Default to first path
+}
+
+// Get dynamic templates directory
+function getDynamicTemplatesDir(): string {
+  const templatesDir = getTemplatesDir();
+  return join(templatesDir, 'dynamic');
 }
 
 export interface TemplateFile {
@@ -93,30 +100,113 @@ async function getFilesRecursive(dir: string, relativePath: string): Promise<Tem
   return files;
 }
 
+/**
+ * Read and process a dynamic template file
+ */
+function processTemplateFile(templateName: string, context: TemplateContext): string | null {
+  const dynamicDir = getDynamicTemplatesDir();
+  const templatePath = join(dynamicDir, templateName);
+
+  if (!existsSync(templatePath)) {
+    return null;
+  }
+
+  const engine = createTemplateEngine(context.features, {
+    projectName: context.projectName as string,
+    author: context.author as string,
+    description: context.description as string,
+    license: context.license as string,
+  });
+
+  return engine.processFile(templatePath);
+}
+
 // Get source file content for a specific template
 export async function getSourceFileContent(
   templateId: string,
-  features: FeatureFlags
+  features: FeatureFlags,
+  projectConfig?: { projectName?: string; author?: string; description?: string; license?: string }
 ): Promise<Map<string, string>> {
   const contentMap = new Map<string, string>();
 
+  // Create template context
+  const context: TemplateContext = {
+    features,
+    projectName: projectConfig?.projectName || 'my-app',
+    author: projectConfig?.author || '',
+    description: projectConfig?.description || '',
+    license: projectConfig?.license || 'MIT',
+    hasProviders: features.redux || features.reactRouter || features.i18n,
+    providerOrder: [],
+  };
+
+  // Try to use dynamic templates first
+  const dynamicDir = getDynamicTemplatesDir();
+
   // Generate main.tsx content
-  contentMap.set('src/main.tsx', generateMainTsx(features));
+  const mainContent = processTemplateFile('main.tsx.template', context);
+  contentMap.set('src/main.tsx', mainContent || generateMainTsx(features));
 
   // Generate App.tsx content
-  contentMap.set('src/App.tsx', generateAppTsx(features));
+  const appContent = processTemplateFile('App.tsx.template', context);
+  contentMap.set('src/App.tsx', appContent || generateAppTsx(features));
 
   // Generate App.css content
-  contentMap.set('src/App.css', generateAppCss(features));
+  const cssContent = processTemplateFile('App.css.template', context);
+  contentMap.set('src/App.css', cssContent || generateAppCss(features));
+
+  // Generate vite.config.ts content
+  const viteContent = processTemplateFile('vite.config.ts.template', context);
+  if (viteContent) {
+    contentMap.set('vite.config.ts', viteContent);
+  }
 
   // Redux files
   if (features.redux) {
-    contentMap.set('src/store/store.ts', generateReduxStore());
-    contentMap.set('src/store/slices/appSlice.ts', generateReduxSlice());
+    const storeContent = processTemplateFile('store/store.ts.template', context);
+    contentMap.set('src/store/store.ts', storeContent || generateReduxStore());
+
+    const sliceContent = processTemplateFile('store/slices/appSlice.ts.template', context);
+    contentMap.set('src/store/slices/appSlice.ts', sliceContent || generateReduxSlice());
+  }
+
+  // i18n files
+  if (features.i18n) {
+    const i18nConfigContent = processTemplateFile('i18n/config.ts.template', context);
+    if (i18nConfigContent) {
+      contentMap.set('src/i18n/config.ts', i18nConfigContent);
+    } else {
+      contentMap.set('src/i18n/config.ts', generateI18nConfig());
+    }
+
+    // Translation files - read directly without processing (JSON files)
+    const locales = ['en', 'pt', 'es'];
+    for (const locale of locales) {
+      const localePath = join(dynamicDir, `i18n/locales/${locale}.json.template`);
+      if (existsSync(localePath)) {
+        const content = readFileSync(localePath, 'utf-8');
+        contentMap.set(`src/i18n/locales/${locale}.json`, content);
+      } else {
+        contentMap.set(`src/i18n/locales/${locale}.json`, generateLocaleFile(locale));
+      }
+    }
+  }
+
+  // Generate POSSIBILITIES.md
+  const possibilitiesContent = processTemplateFile('POSSIBILITIES.md.template', {
+    ...context,
+    packageManager: 'npm', // Default, will be replaced by ProjectCreator
+  });
+  if (possibilitiesContent) {
+    contentMap.set('POSSIBILITIES.md', possibilitiesContent);
   }
 
   return contentMap;
 }
+
+// ============================================================================
+// FALLBACK GENERATORS (used when templates are not available)
+// ============================================================================
 
 function generateMainTsx(features: FeatureFlags): string {
   const imports = [
@@ -136,6 +226,10 @@ function generateMainTsx(features: FeatureFlags): string {
 
   if (features.reactRouter) {
     imports.push("import { BrowserRouter } from 'react-router-dom';");
+  }
+
+  if (features.i18n) {
+    imports.push("import './i18n/config';");
   }
 
   let appContent = '<App />';
@@ -245,4 +339,118 @@ export const { setTheme, toggleTheme } = appSlice.actions;
 export const selectTheme = (state: RootState) => state.app.theme;
 export default appSlice.reducer;
 `;
+}
+
+function generateI18nConfig(): string {
+  return `import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+
+import en from './locales/en.json';
+import pt from './locales/pt.json';
+import es from './locales/es.json';
+
+const resources = {
+  en: { translation: en },
+  pt: { translation: pt },
+  es: { translation: es },
+};
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources,
+    fallbackLng: 'en',
+    debug: import.meta.env.DEV,
+    interpolation: {
+      escapeValue: false,
+    },
+    detection: {
+      order: ['localStorage', 'navigator', 'htmlTag'],
+      caches: ['localStorage'],
+    },
+  });
+
+export default i18n;
+`;
+}
+
+function generateLocaleFile(locale: string): string {
+  const translations: Record<string, object> = {
+    en: {
+      hero: {
+        title: 'React + Vite Starter',
+        subtitle: 'A modern starting point for your React projects',
+      },
+      features: {
+        counter: { title: 'useState Hook', description: 'Click to increment' },
+        timer: { title: 'useEffect Hook', description: 'Auto-incrementing timer' },
+        redux: { title: 'Redux Theme', description: 'Theme managed by Redux' },
+        router: { title: 'React Router', description: 'Navigate between pages' },
+        i18n: { title: 'Internationalization', description: 'Switch languages' },
+      },
+      common: {
+        increment: 'Increment',
+        start: 'Start',
+        stop: 'Stop',
+        reset: 'Reset',
+        lightMode: 'Light',
+        darkMode: 'Dark',
+        home: 'Home',
+        about: 'About',
+      },
+      footer: { madeWith: 'Made with ❤️ by' },
+    },
+    pt: {
+      hero: {
+        title: 'React + Vite Starter',
+        subtitle: 'Um ponto de partida moderno para seus projetos React',
+      },
+      features: {
+        counter: { title: 'Hook useState', description: 'Clique para incrementar' },
+        timer: { title: 'Hook useEffect', description: 'Temporizador auto-incrementante' },
+        redux: { title: 'Tema Redux', description: 'Tema gerenciado pelo Redux' },
+        router: { title: 'React Router', description: 'Navegue entre páginas' },
+        i18n: { title: 'Internacionalização', description: 'Alterne idiomas' },
+      },
+      common: {
+        increment: 'Incrementar',
+        start: 'Iniciar',
+        stop: 'Parar',
+        reset: 'Resetar',
+        lightMode: 'Claro',
+        darkMode: 'Escuro',
+        home: 'Início',
+        about: 'Sobre',
+      },
+      footer: { madeWith: 'Feito com ❤️ por' },
+    },
+    es: {
+      hero: {
+        title: 'React + Vite Starter',
+        subtitle: 'Un punto de partida moderno para tus proyectos React',
+      },
+      features: {
+        counter: { title: 'Hook useState', description: 'Haz clic para incrementar' },
+        timer: { title: 'Hook useEffect', description: 'Temporizador auto-incrementante' },
+        redux: { title: 'Tema Redux', description: 'Tema gestionado por Redux' },
+        router: { title: 'React Router', description: 'Navega entre páginas' },
+        i18n: { title: 'Internacionalización', description: 'Cambia idiomas' },
+      },
+      common: {
+        increment: 'Incrementar',
+        start: 'Iniciar',
+        stop: 'Detener',
+        reset: 'Reiniciar',
+        lightMode: 'Claro',
+        darkMode: 'Oscuro',
+        home: 'Inicio',
+        about: 'Acerca',
+      },
+      footer: { madeWith: 'Hecho con ❤️ por' },
+    },
+  };
+
+  return JSON.stringify(translations[locale] || translations.en, null, 2);
 }

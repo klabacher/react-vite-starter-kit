@@ -28,6 +28,7 @@ interface AppProps {
   skipPrompts?: boolean;
   initGit?: boolean;
   installDeps?: boolean;
+  customFeatures?: FeatureFlags;
 }
 
 export function App({
@@ -36,17 +37,21 @@ export function App({
   skipPrompts = false,
   initGit = true,
   installDeps = true,
+  customFeatures,
 }: AppProps): React.ReactElement {
   // Initialize wizard state
   const [state, setState] = useState<WizardState>(() => {
     const template = templateName ? getTemplateById(templateName) : undefined;
+
+    // Use custom features if provided (from CLI flags)
+    const features = customFeatures || template?.features || getDefaultTemplate().features;
 
     return {
       step: skipPrompts && initialProjectName ? 'creating' : 'welcome',
       config: {
         name: initialProjectName,
         template: template || getDefaultTemplate(),
-        features: template?.features || getDefaultTemplate().features,
+        features,
         packageManager: 'npm',
         initGit,
         installDeps,

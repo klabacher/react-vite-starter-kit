@@ -15,6 +15,7 @@ const featureOrder: FeatureKey[] = [
   'tailwindcss',
   'redux',
   'reactRouter',
+  'i18n',
   'eslint',
   'prettier',
   'husky',

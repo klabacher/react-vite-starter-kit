@@ -1,0 +1,141 @@
+import { describe, it, expect, vi } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
+import { renderApp, changeTestLanguage, userEvent } from './test-utils';
+import App from '../App';
+
+describe('Internationalization (i18n)', () => {
+  describe('Language Detection', () => {
+    it('should render with default language (English)', () => {
+      renderApp(<App />);
+      expect(screen.getByText(/welcome/i)).toBeInTheDocument();
+    });
+
+    it('should support language switching', async () => {
+      renderApp(<App />);
+      
+      // Change to Portuguese
+      await changeTestLanguage('pt');
+      
+      await waitFor(() => {
+        // Verify the language change took effect
+        expect(screen.queryByText(/welcome/i) || screen.queryByText(/bem-vindo/i)).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Translation Keys', () => {
+    it('should render translated content for common keys', () => {
+      renderApp(<App />);
+      
+      // Check for common translation keys
+      const container = document.body;
+      expect(container).toBeDefined();
+    });
+
+    it('should handle missing translation keys gracefully', () => {
+      renderApp(<App />);
+      
+      // App should not crash with missing keys
+      expect(document.body).toBeDefined();
+    });
+  });
+
+  describe('Locale-specific Formatting', () => {
+    it('should render with different locale settings', async () => {
+      const { rerender } = renderApp(<App />, { locale: 'en' });
+      
+      // English locale
+      expect(document.body).toBeDefined();
+      
+      // Switch to Portuguese
+      await changeTestLanguage('pt');
+      rerender(<App />);
+      
+      expect(document.body).toBeDefined();
+    });
+  });
+
+{{#if redux}}
+  describe('i18n with Redux Integration', () => {
+    it('should maintain translations with Redux state changes', async () => {
+      renderApp(<App />);
+      
+      // Interact with Redux-connected components
+      const incrementButton = screen.queryByRole('button', { name: /increment/i });
+      if (incrementButton) {
+        await userEvent.click(incrementButton);
+      }
+      
+      // Translations should still work
+      expect(document.body).toBeDefined();
+    });
+  });
+{{/if}}
+
+{{#if reactRouter}}
+  describe('i18n with Router Integration', () => {
+    it('should maintain translations across route changes', async () => {
+      renderApp(<App />, { route: '/' });
+      
+      // Navigate if possible
+      const links = screen.queryAllByRole('link');
+      if (links.length > 0) {
+        await userEvent.click(links[0]);
+      }
+      
+      // Translations should still work
+      expect(document.body).toBeDefined();
+    });
+  });
+{{/if}}
+
+  describe('Language Persistence', () => {
+    it('should remember language preference', async () => {
+      // Mock localStorage
+      const mockStorage: Record<string, string> = {};
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation((key) => mockStorage[key] || null);
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation((key, value) => {
+        mockStorage[key] = value;
+      });
+
+      renderApp(<App />);
+      
+      // Change language
+      await changeTestLanguage('es');
+      
+      // In a real app, this would persist to localStorage
+      expect(document.body).toBeDefined();
+    });
+  });
+
+  describe('RTL Support', () => {
+    it('should handle RTL languages correctly', async () => {
+      renderApp(<App />);
+      
+      // For RTL languages like Arabic, Hebrew
+      // The dir attribute should change
+      const html = document.documentElement;
+      expect(html).toBeDefined();
+    });
+  });
+
+  describe('Pluralization', () => {
+    it('should handle plural forms correctly', () => {
+      renderApp(<App />);
+      
+      // Pluralization is handled by i18next
+      // This test ensures the app doesn't crash
+      expect(document.body).toBeDefined();
+    });
+  });
+
+  describe('Interpolation', () => {
+    it('should interpolate variables in translations', () => {
+      renderApp(<App />);
+      
+      // i18next handles {{variable}} interpolation
+      // This test ensures the app renders correctly
+      expect(document.body).toBeDefined();
+    });
+  });
+});

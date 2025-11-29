@@ -71,3 +71,21 @@ const sessionStorageMock = {
   key: vi.fn(),
 };
 Object.defineProperty(window, 'sessionStorage', { value: sessionStorageMock });
+
+{{#if i18n}}
+// Mock i18next for tests that don't use the full provider
+vi.mock('react-i18next', async () => {
+  const actual = await vi.importActual('react-i18next');
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string) => key,
+      i18n: {
+        language: 'en',
+        changeLanguage: vi.fn().mockResolvedValue(undefined),
+      },
+    }),
+    Trans: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
+{{/if}}

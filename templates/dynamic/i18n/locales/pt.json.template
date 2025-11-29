@@ -1,0 +1,55 @@
+{
+  "hero": {
+    "title": "React + Vite Starter",
+    "subtitle": "Um ponto de partida moderno, rápido e elegante para seus projetos React"
+  },
+  "features": {
+    "counter": {
+      "title": "Hook useState",
+      "description": "Clique no botão para incrementar o contador"
+    },
+    "timer": {
+      "title": "Hook useEffect",
+      "description": "Temporizador auto-incrementante usando useEffect"
+    },
+    "redux": {
+      "title": "Seletor de Tema Redux",
+      "description": "Estado do tema gerenciado pelo Redux Toolkit"
+    },
+    "router": {
+      "title": "React Router",
+      "description": "Navegue entre páginas com React Router"
+    },
+    "i18n": {
+      "title": "Internacionalização",
+      "description": "Alterne entre idiomas com react-i18next"
+    }
+  },
+  "footer": {
+    "madeWith": "Feito com ❤️ por",
+    "by": "João Vitor Klabacher"
+  },
+  "common": {
+    "increment": "Incrementar",
+    "start": "Iniciar",
+    "stop": "Parar",
+    "reset": "Resetar",
+    "lightMode": "Modo Claro",
+    "darkMode": "Modo Escuro",
+    "language": "Idioma",
+    "currentTheme": "Tema atual",
+    "about": "Sobre",
+    "home": "Início",
+    "poweredBy": "Desenvolvido com"
+  },
+  "pages": {
+    "about": {
+      "title": "Sobre Este Projeto",
+      "description": "Este app de demonstração foi gerado pelo react-vite-starter-kit, mostrando todas as funcionalidades que você selecionou durante a configuração."
+    },
+    "features": {
+      "title": "Funcionalidades Disponíveis",
+      "description": "Explore as poderosas funcionalidades incluídas no seu projeto."
+    }
+  }
+}

@@ -1,0 +1,34 @@
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+{{#if features.tailwindcss}}
+import './App.css';
+{{/if}}
+{{#if features.redux}}
+import { Provider } from 'react-redux';
+import { store } from './store/store';
+{{/if}}
+{{#if features.reactRouter}}
+import { BrowserRouter } from 'react-router-dom';
+{{/if}}
+{{#if features.i18n}}
+import './i18n/config';
+{{/if}}
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+{{#if features.redux}}
+    <Provider store={store}>
+{{/if}}
+{{#if features.reactRouter}}
+      <BrowserRouter>
+{{/if}}
+        <App />
+{{#if features.reactRouter}}
+      </BrowserRouter>
+{{/if}}
+{{#if features.redux}}
+    </Provider>
+{{/if}}
+  </StrictMode>
+);
