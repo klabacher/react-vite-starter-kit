@@ -12,7 +12,8 @@ const __dirname = dirname(__filename);
 function getTemplatesDir(): string {
   // Check for templates in different locations
   const possiblePaths = [
-    join(__dirname, '../../templates'), // From dist/logics/
+    join(__dirname, '../templates'), // From bundled dist/main.js
+    join(__dirname, '../../templates'), // From dist/logics/ (dev)
     join(__dirname, '../../../templates'), // Alternative path
     join(process.cwd(), 'templates'), // Current working directory
   ];

@@ -56,9 +56,10 @@ export class TemplateEngine {
    */
   private findTemplatesDir(): string {
     const possiblePaths = [
-      path.join(__dirname, '../../templates/dynamic'),
-      path.join(__dirname, '../../../templates/dynamic'),
-      path.join(process.cwd(), 'templates/dynamic'),
+      path.join(__dirname, '../templates/dynamic'), // From bundled dist/main.js
+      path.join(__dirname, '../../templates/dynamic'), // From dist/logics/ (dev)
+      path.join(__dirname, '../../../templates/dynamic'), // Alternative path
+      path.join(process.cwd(), 'templates/dynamic'), // Current working directory
     ];
 
     for (const p of possiblePaths) {

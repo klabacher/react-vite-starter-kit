@@ -1,9 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
-{{#if custom}}
-import { renderApp, userEvent } from '../test/test-utils';
+{{#if redux}}
+import { renderApp, waitFor } from '../test/test-utils';
+{{else}}
+{{#if reactRouter}}
+import { renderApp, waitFor } from '../test/test-utils';
 {{else}}
 import { renderApp } from '../test/test-utils';
+{{/if}}
 {{/if}}
 import App from '../App';
 
