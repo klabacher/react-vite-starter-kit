@@ -12,6 +12,10 @@ dist-ssr/
 *.local
 build/
 
+test-minimal/
+test-standard/
+test-full-stack/
+
 # Logs
 logs/
 *.log
@@ -70,6 +74,8 @@ tmp/
 temp/
 *.tmp
 *.temp
+
+#
 
 # Lock files (keep package-lock.json, ignore others for this project)
 yarn.lock

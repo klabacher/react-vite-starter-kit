@@ -8,6 +8,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
+ * Get the test templates directory with fallback paths
+ */
+function getTestTemplatesDir(): string {
+  const possiblePaths = [
+    path.resolve(__dirname, '../../templates/test-templates'), // From dist/logics/
+    path.resolve(__dirname, '../../../templates/test-templates'), // Alternative path
+    path.join(process.cwd(), 'templates/test-templates'), // Current working directory
+  ];
+
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      return p;
+    }
+  }
+
+  return possiblePaths[0]; // Default to first path
+}
+
+/**
  * TestGenerator - Generates test files from templates based on features and profile
  */
 export class TestGenerator {
@@ -18,7 +37,7 @@ export class TestGenerator {
   constructor(features: FeatureFlags) {
     this.features = features;
     this.profile = testProfiles[features.testProfile || 'standard'];
-    this.templatesDir = path.resolve(__dirname, '../../templates/test-templates');
+    this.templatesDir = getTestTemplatesDir();
   }
 
   /**
