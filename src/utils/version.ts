@@ -10,7 +10,8 @@ export function getVersion(): string {
   try {
     // Try multiple possible paths (dev vs built)
     const possiblePaths = [
-      join(__dirname, '../../package.json'), // From dist/utils/
+      join(__dirname, '../package.json'), // From bundled dist/main.js
+      join(__dirname, '../../package.json'), // From dist/utils/ (dev)
       join(__dirname, '../../../package.json'), // Alternative
       join(process.cwd(), 'package.json'), // Current directory
     ];

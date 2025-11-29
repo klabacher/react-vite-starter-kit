@@ -1,13 +1,16 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { screen, waitFor, within } from '@testing-library/react';
-import { renderApp, userEvent } from '../test/test-utils';
 {{#if redux}}
-import { Provider } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { store } from '../store/store';
 import { toggleTheme, setTheme, selectTheme } from '../store/slices/appSlice';
+{{else}}
+import { useState } from 'react';
 {{/if}}
 {{#if reactRouter}}
 import { Routes, Route, Link } from 'react-router-dom';
+import { renderApp, screen, waitFor, userEvent } from '../test/test-utils';
+{{else}}
+import { renderApp, screen, userEvent } from '../test/test-utils';
 {{/if}}
 
 // Integration test component
@@ -15,7 +18,7 @@ function ThemeToggler() {
   {{#if redux}}
   const theme = useSelector(selectTheme);
   const dispatch = useDispatch();
-  
+
   return (
     <div>
       <span data-testid="theme">{theme}</span>
@@ -25,8 +28,8 @@ function ThemeToggler() {
     </div>
   );
   {{else}}
-  const [theme, setThemeState] = React.useState('dark');
-  
+  const [theme, setThemeState] = useState('dark');
+
   return (
     <div>
       <span data-testid="theme">{theme}</span>
@@ -39,9 +42,6 @@ function ThemeToggler() {
 }
 
 {{#if redux}}
-import { useSelector, useDispatch } from 'react-redux';
-import React from 'react';
-
 describe('Redux Integration', () => {
   beforeEach(() => {
     store.dispatch(setTheme('dark'));
@@ -56,7 +56,7 @@ describe('Redux Integration', () => {
     it('should toggle theme on button click', async () => {
       const user = userEvent.setup();
       renderApp(<ThemeToggler />);
-      
+
       await user.click(screen.getByTestId('toggle'));
       expect(screen.getByTestId('theme')).toHaveTextContent('light');
     });
@@ -64,7 +64,7 @@ describe('Redux Integration', () => {
     it('should set theme to light', async () => {
       const user = userEvent.setup();
       renderApp(<ThemeToggler />);
-      
+
       await user.click(screen.getByTestId('set-light'));
       expect(screen.getByTestId('theme')).toHaveTextContent('light');
     });
@@ -73,7 +73,7 @@ describe('Redux Integration', () => {
       const user = userEvent.setup();
       store.dispatch(setTheme('light'));
       renderApp(<ThemeToggler />);
-      
+
       await user.click(screen.getByTestId('set-dark'));
       expect(screen.getByTestId('theme')).toHaveTextContent('dark');
     });
@@ -81,12 +81,12 @@ describe('Redux Integration', () => {
     it('should handle multiple toggles', async () => {
       const user = userEvent.setup();
       renderApp(<ThemeToggler />);
-      
+
       const toggleBtn = screen.getByTestId('toggle');
       await user.click(toggleBtn); // dark -> light
       await user.click(toggleBtn); // light -> dark
       await user.click(toggleBtn); // dark -> light
-      
+
       expect(screen.getByTestId('theme')).toHaveTextContent('light');
     });
   });
@@ -124,17 +124,17 @@ describe('Redux Integration', () => {
     it('should persist Redux state across navigation', async () => {
       const user = userEvent.setup();
       renderApp(<AppWithRouter />, { route: '/' });
-      
+
       // Toggle theme
       await user.click(screen.getByTestId('toggle'));
       expect(screen.getByTestId('theme')).toHaveTextContent('light');
-      
+
       // Navigate away
       await user.click(screen.getByTestId('other-link'));
       await waitFor(() => {
         expect(screen.queryByTestId('theme')).not.toBeInTheDocument();
       });
-      
+
       // Navigate back
       await user.click(screen.getByTestId('theme-link'));
       await waitFor(() => {
@@ -145,8 +145,6 @@ describe('Redux Integration', () => {
   {{/if}}
 });
 {{else}}
-import React from 'react';
-
 describe('Component Integration', () => {
   describe('ThemeToggler Component', () => {
     it('should display initial theme', () => {
@@ -157,7 +155,7 @@ describe('Component Integration', () => {
     it('should toggle theme on button click', async () => {
       const user = userEvent.setup();
       renderApp(<ThemeToggler />);
-      
+
       await user.click(screen.getByTestId('toggle'));
       expect(screen.getByTestId('theme')).toHaveTextContent('light');
     });
@@ -165,7 +163,7 @@ describe('Component Integration', () => {
     it('should set theme to light', async () => {
       const user = userEvent.setup();
       renderApp(<ThemeToggler />);
-      
+
       await user.click(screen.getByTestId('set-light'));
       expect(screen.getByTestId('theme')).toHaveTextContent('light');
     });
@@ -173,7 +171,7 @@ describe('Component Integration', () => {
     it('should set theme to dark', async () => {
       const user = userEvent.setup();
       renderApp(<ThemeToggler />);
-      
+
       await user.click(screen.getByTestId('toggle'));
       await user.click(screen.getByTestId('set-dark'));
       expect(screen.getByTestId('theme')).toHaveTextContent('dark');

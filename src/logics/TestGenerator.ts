@@ -12,7 +12,8 @@ const __dirname = path.dirname(__filename);
  */
 function getTestTemplatesDir(): string {
   const possiblePaths = [
-    path.resolve(__dirname, '../../templates/test-templates'), // From dist/logics/
+    path.resolve(__dirname, '../templates/test-templates'), // From bundled dist/main.js
+    path.resolve(__dirname, '../../templates/test-templates'), // From dist/logics/ (dev)
     path.resolve(__dirname, '../../../templates/test-templates'), // Alternative path
     path.join(process.cwd(), 'templates/test-templates'), // Current working directory
   ];
@@ -54,22 +55,135 @@ export class TestGenerator {
   }
 
   /**
-   * Process template conditionals ({{#if feature}}...{{/if}})
+   * Find the matching closing tag for a block, handling nested blocks
+   */
+  private findMatchingClose(
+    template: string,
+    startIndex: number,
+    openTag: string,
+    closeTag: string
+  ): number {
+    let depth = 1;
+    let pos = startIndex;
+
+    while (pos < template.length && depth > 0) {
+      const nextOpen = template.indexOf(openTag, pos);
+      const nextClose = template.indexOf(closeTag, pos);
+
+      if (nextClose === -1) {
+        // No closing tag found
+        return -1;
+      }
+
+      if (nextOpen !== -1 && nextOpen < nextClose) {
+        // Found another opening tag first
+        depth++;
+        pos = nextOpen + openTag.length;
+      } else {
+        // Found closing tag
+        depth--;
+        if (depth === 0) {
+          return nextClose;
+        }
+        pos = nextClose + closeTag.length;
+      }
+    }
+
+    return -1;
+  }
+
+  /**
+   * Find {{else}} at the same nesting level (not inside nested #if blocks)
+   */
+  private findElseAtSameLevel(content: string): number {
+    let depth = 0;
+    let pos = 0;
+
+    while (pos < content.length) {
+      const nextIf = content.indexOf('{{#if', pos);
+      const nextElse = content.indexOf('{{else}}', pos);
+      const nextEndIf = content.indexOf('{{/if}}', pos);
+
+      // Find the earliest occurrence
+      const positions = [
+        { type: 'if', pos: nextIf },
+        { type: 'else', pos: nextElse },
+        { type: 'endif', pos: nextEndIf },
+      ]
+        .filter(p => p.pos !== -1)
+        .sort((a, b) => a.pos - b.pos);
+
+      if (positions.length === 0) break;
+
+      const next = positions[0];
+
+      if (next.type === 'if') {
+        depth++;
+        pos = next.pos + 5; // length of '{{#if'
+      } else if (next.type === 'endif') {
+        depth--;
+        pos = next.pos + 7; // length of '{{/if}}'
+      } else if (next.type === 'else') {
+        if (depth === 0) {
+          return next.pos;
+        }
+        pos = next.pos + 8; // length of '{{else}}'
+      }
+    }
+
+    return -1;
+  }
+
+  /**
+   * Process template conditionals with proper nested block handling
    */
   private processConditionals(template: string): string {
+    const openRegex = /\{\{#if\s+(\w+)\}\}/g;
     let result = template;
+    let match;
 
-    // Process {{#if feature}}...{{else}}...{{/if}} blocks
-    const ifElseRegex = /\{\{#if\s+(\w+)\}\}([\s\S]*?)\{\{else\}\}([\s\S]*?)\{\{\/if\}\}/g;
-    result = result.replace(ifElseRegex, (_match, feature, ifContent, elseContent) => {
-      return this.getFeatureValue(feature) ? ifContent : elseContent;
-    });
+    // Reset lastIndex to ensure we start from the beginning
+    openRegex.lastIndex = 0;
 
-    // Process {{#if feature}}...{{/if}} blocks (without else)
-    const ifRegex = /\{\{#if\s+(\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g;
-    result = result.replace(ifRegex, (_match, feature, content) => {
-      return this.getFeatureValue(feature) ? content : '';
-    });
+    while ((match = openRegex.exec(result)) !== null) {
+      const fullOpenTag = match[0];
+      const feature = match[1];
+      const startIndex = match.index;
+      const contentStart = startIndex + fullOpenTag.length;
+      const closeIndex = this.findMatchingClose(result, contentStart, '{{#if', '{{/if}}');
+
+      if (closeIndex === -1) continue;
+
+      const fullContent = result.substring(contentStart, closeIndex);
+
+      // Find {{else}} at the same nesting level
+      const elseIndex = this.findElseAtSameLevel(fullContent);
+
+      let ifContent: string;
+      let elseContent: string;
+
+      if (elseIndex !== -1) {
+        ifContent = fullContent.substring(0, elseIndex);
+        elseContent = fullContent.substring(elseIndex + '{{else}}'.length);
+      } else {
+        ifContent = fullContent;
+        elseContent = '';
+      }
+
+      const featureValue = this.getFeatureValue(feature);
+      // Recursively process the chosen content to handle nested conditionals
+      const replacement = featureValue
+        ? this.processConditionals(ifContent)
+        : this.processConditionals(elseContent);
+
+      result =
+        result.substring(0, startIndex) +
+        replacement +
+        result.substring(closeIndex + '{{/if}}'.length);
+
+      // Reset regex to search from the start since we modified the string
+      openRegex.lastIndex = 0;
+    }
 
     return result;
   }
