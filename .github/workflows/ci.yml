@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, pre-release, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [main, pre-release, develop]
 
 permissions:
   contents: write
@@ -81,10 +81,10 @@ jobs:
             cd test-project && npm run test
           fi
 
-  publish-develop:
+  publish-pre-release:
     needs: [test, test-templates]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/pre-release' && github.event_name == 'push'
 
     steps:
       - name: Checkout repository
@@ -103,8 +103,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish to npm (next tag)
-        run: npm publish --tag next
+      - name: Publish to npm (pre-release tag)
+        run: npm publish --tag pre-release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
