@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0-beta.1] - 2025-11-30
+
+### Added
+
+- **Documentation overhaul** - Complete README rewrite with professional tone, badges, and comprehensive sections
+- **Multi-branch CI/CD** - GitHub Actions workflow supporting main and develop branches
+- **GitHub releases automation** - Automatic GitHub releases with softprops/action-gh-release
+- **npm auto-publish** - Automated npm publishing on main (stable) and develop (next tag)
+- **CONTRIBUTING.md** - Development setup, code style guidelines, and contribution process
+- **CODE_OF_CONDUCT.md** - Contributor Covenant v2.1
+- **SECURITY.md** - Security policy with supported versions and vulnerability reporting
+- **Issue templates** - YAML form templates for bug reports and feature requests
+- **PR template** - Pull request template with description, type, and checklist
+
+### Changed
+
+- **Repository URLs** - Corrected all URLs to point to react-vite-starter-kit repository
+- **README** - Rewritten professionally without emojis, with proper documentation structure
+
+### Fixed
+
+- **Homepage URL** - Corrected from tsvite-react-tailwind-boilerplate to react-vite-starter-kit
+- **Bugs URL** - Corrected issue tracker URL
+- **Repository URL** - Corrected git repository URL
+
 ## [0.0.6] - 2025-11-29
 
 ### Fixed

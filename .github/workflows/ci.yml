@@ -2,12 +2,15 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
+
+permissions:
+  contents: write
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     strategy:
@@ -35,14 +38,12 @@ jobs:
 
       - name: Run tests
         run: npm run test
-        
+
       - name: Build
         run: npm run build
-# Create a separate job to full build templates and test them individually for each version of node
-  
-  # Test generated projects for each template
+
   test-templates:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -80,18 +81,17 @@ jobs:
             cd test-project && npm run test
           fi
 
-  # Publish only after ALL jobs pass successfully
-  publish:
-    needs: [build, test-templates]
+  publish-develop:
+    needs: [test, test-templates]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
@@ -103,8 +103,53 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Uncomment to enable auto-publish
-      # - name: Publish to npm
-      #   run: npm publish
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm (next tag)
+        run: npm publish --tag next
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}-next
+          name: Pre-release v${{ github.run_number }}
+          prerelease: true
+          generate_release_notes: true
+
+  publish-production:
+    needs: [test, test-templates]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Get package version
+        id: pkg
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.pkg.outputs.version }}
+          name: Release v${{ steps.pkg.outputs.version }}
+          generate_release_notes: true
