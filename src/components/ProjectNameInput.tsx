@@ -14,19 +14,20 @@ export function ProjectNameInput({
   initialValue = '',
   onSubmit,
 }: ProjectNameInputProps): React.ReactElement {
-  const [name, setName] = useState(initialValue);
+  const [name, setName] = useState(initialValue.trim());
   const [error, setError] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<string | null>(null);
 
   const handleChange = (value: string) => {
-    setName(value);
+    const cleanValue = value.replace(/[\r\n]+/g, '');
+    setName(cleanValue);
     setError(null);
 
     // Provide suggestions for invalid names
-    const validation = validateProjectName(value);
-    if (!validation.valid && value.length > 0) {
-      const suggested = suggestValidName(value);
-      setSuggestion(suggested !== value ? suggested : null);
+    const validation = validateProjectName(cleanValue);
+    if (!validation.valid && cleanValue.length > 0) {
+      const suggested = suggestValidName(cleanValue);
+      setSuggestion(suggested !== cleanValue ? suggested : null);
     } else {
       setSuggestion(null);
     }
@@ -34,7 +35,7 @@ export function ProjectNameInput({
 
   const handleSubmit = (value: string) => {
     const validation = validateProjectName(value);
-
+    // TODO: Show suggestion instead of error
     if (!validation.valid) {
       setError(validation.errors.join(', '));
       return;

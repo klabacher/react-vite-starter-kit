@@ -1,5 +1,4 @@
 {{!-- Dynamic Showcase App Template --}}
-{{!-- This template generates a beautiful, responsive app based on selected features --}}
 
 import './App.css';
 {{#if features.tailwindcss}}
@@ -39,16 +38,13 @@ const ViteLogo = () => (
         <stop offset="100%" stopColor="#FF980E"/>
       </linearGradient>
     </defs>
-    <path fill="url(#viteGrad1)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 002.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62z" transform="scale(.1)"/>
-    <path fill="url(#viteGrad2)" d="M185.432.063L96.44 17.501a3.268 3.268 0 00-2.634 3.014l-5.474 92.456a3.268 3.268 0 003.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028 72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113z" transform="scale(.1)"/>
+    <path fill="url(#viteGrad1)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 002.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62z"/>
+    <path fill="url(#viteGrad2)" d="M185.432.063L96.44 17.501a3.268 3.268 0 00-2.634 3.014l-5.474 92.456a3.268 3.268 0 003.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028 72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113z" />
   </svg>
 );
 
 const TypeScriptLogo = () => (
-  <svg viewBox="0 0 256 256" className="w-10 h-10">
-    <rect width="256" height="256" rx="20" fill="#3178C6"/>
-    <path fill="#fff" d="M150.518 200.475v27.62c4.492 2.302 9.805 4.028 15.938 5.179 6.133 1.151 12.597 1.726 19.393 1.726 6.622 0 12.914-.633 18.874-1.899 5.96-1.266 11.187-3.352 15.678-6.257 4.492-2.906 8.048-6.704 10.669-11.394 2.62-4.689 3.93-10.486 3.93-17.391 0-5.006-.749-9.394-2.246-13.163-1.497-3.769-3.638-7.166-6.422-10.191-2.784-3.025-6.145-5.823-10.083-8.394-3.938-2.571-8.318-5.006-13.14-7.306-3.511-1.727-6.622-3.378-9.333-4.953-2.711-1.576-4.996-3.128-6.854-4.659-1.858-1.53-3.27-3.128-4.236-4.793-.966-1.664-1.449-3.487-1.449-5.468 0-1.849.414-3.533 1.241-5.053.828-1.52 2.03-2.847 3.605-3.981 1.576-1.134 3.511-2.014 5.806-2.64 2.295-.627 4.921-.94 7.878-.94 2.073 0 4.259.182 6.557.547 2.299.364 4.61.918 6.933 1.66 2.323.742 4.564 1.665 6.724 2.769 2.16 1.104 4.135 2.378 5.927 3.821v-25.791c-3.938-1.576-8.272-2.725-13-3.448-4.729-.723-10.161-1.084-16.296-1.084-6.577 0-12.798.69-18.664 2.072-5.866 1.382-11.03 3.511-15.49 6.39-4.461 2.878-7.985 6.577-10.573 11.095-2.587 4.519-3.881 9.938-3.881 16.258 0 8.271 2.426 15.333 7.277 21.186 4.852 5.852 12.151 10.756 21.898 14.711 3.858 1.576 7.403 3.128 10.635 4.659 3.231 1.53 6.007 3.128 8.326 4.793 2.32 1.664 4.135 3.487 5.447 5.468 1.312 1.981 1.968 4.22 1.968 6.717 0 1.713-.368 3.304-1.104 4.774-.736 1.47-1.858 2.759-3.365 3.867-1.508 1.108-3.421 1.974-5.739 2.598-2.319.625-5.026.937-8.123.937-5.435 0-10.984-1.04-16.647-3.119-5.663-2.079-10.892-5.179-15.686-9.3zM100.593 141.063H66.158v83.411H38.307v-83.411H0v-22.578h100.593v22.578z"/>
-  </svg>
+  <svg fill="none" height="48" viewBox="0 0 512 512" width="48" xmlns="http://www.w3.org/2000/svg"><rect fill="#3178c6" height="512" rx="50" width="512"></rect><rect fill="#3178c6" height="512" rx="50" width="512"></rect><path clipRule="evenodd" d="m316.939 407.424v50.061c8.138 4.172 17.763 7.3 28.875 9.386s22.823 3.129 35.135 3.129c11.999 0 23.397-1.147 34.196-3.442 10.799-2.294 20.268-6.075 28.406-11.342 8.138-5.266 14.581-12.15 19.328-20.65s7.121-19.007 7.121-31.522c0-9.074-1.356-17.026-4.069-23.857s-6.625-12.906-11.738-18.225c-5.112-5.319-11.242-10.091-18.389-14.315s-15.207-8.213-24.18-11.967c-6.573-2.712-12.468-5.345-17.685-7.9-5.217-2.556-9.651-5.163-13.303-7.822-3.652-2.66-6.469-5.476-8.451-8.448-1.982-2.973-2.974-6.336-2.974-10.091 0-3.441.887-6.544 2.661-9.308s4.278-5.136 7.512-7.118c3.235-1.981 7.199-3.52 11.894-4.615 4.696-1.095 9.912-1.642 15.651-1.642 4.173 0 8.581.313 13.224.938 4.643.626 9.312 1.591 14.008 2.894 4.695 1.304 9.259 2.947 13.694 4.928 4.434 1.982 8.529 4.276 12.285 6.884v-46.776c-7.616-2.92-15.937-5.084-24.962-6.492s-19.381-2.112-31.066-2.112c-11.895 0-23.163 1.278-33.805 3.833s-20.006 6.544-28.093 11.967c-8.086 5.424-14.476 12.333-19.171 20.729-4.695 8.395-7.043 18.433-7.043 30.114 0 14.914 4.304 27.638 12.912 38.172 8.607 10.533 21.675 19.45 39.204 26.751 6.886 2.816 13.303 5.579 19.25 8.291s11.086 5.528 15.415 8.448c4.33 2.92 7.747 6.101 10.252 9.543 2.504 3.441 3.756 7.352 3.756 11.733 0 3.233-.783 6.231-2.348 8.995s-3.939 5.162-7.121 7.196-7.147 3.624-11.894 4.771c-4.748 1.148-10.303 1.721-16.668 1.721-10.851 0-21.597-1.903-32.24-5.71-10.642-3.806-20.502-9.516-29.579-17.13zm-84.159-123.342h64.22v-41.082h-179v41.082h63.906v182.918h50.874z" fill="#fff" fillRule="evenodd"></path></svg>
 );
 {{/if}}
 
@@ -178,7 +174,7 @@ function HomePage({ isDark }: { isDark: boolean }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold">{{#if features.i18n}}{t('features.counter.title')}{{else}}useState Hook{{/if}}</h3>
+            <h2 className="text-xl font-bold">{{#if features.i18n}}{t('features.counter.title')}{{else}}useState Hook{{/if}}</h2>
           </div>
           <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             {{#if features.i18n}}{t('features.counter.description')}{{else}}Click the button to increment the counter{{/if}}
@@ -208,7 +204,7 @@ function HomePage({ isDark }: { isDark: boolean }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold">{{#if features.i18n}}{t('features.timer.title')}{{else}}useEffect Hook{{/if}}</h3>
+            <h2 className="text-xl font-bold">{{#if features.i18n}}{t('features.timer.title')}{{else}}useEffect Hook{{/if}}</h2>
           </div>
           <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             {{#if features.i18n}}{t('features.timer.description')}{{else}}Auto-incrementing timer using useEffect{{/if}}
@@ -226,7 +222,7 @@ function HomePage({ isDark }: { isDark: boolean }) {
                     : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-green-500/25'
                 }`}
               >
-                {isRunning ? {{#if features.i18n}}t('common.stop'){{else}}'Stop'{{/if}} : {{#if features.i18n}}t('common.start'){{else}}'Start'{{/if}}}
+                {{#if features.i18n}}{isRunning ? t('common.stop') : t('common.start')}{{else}}{isRunning ? 'Stop' : 'Start'}{{/if}}
               </button>
               <button
                 onClick={() => setAutoCount(0)}
@@ -356,8 +352,9 @@ function App() {
 
         {/* Tech Stack Logos */}
         <section className="mb-16">
+          <h2 className="sr-only">Technologies Used</h2>
           <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
-            <a href="https://react.dev" target="_blank" rel="noopener noreferrer" className="group">
+            <a href="https://react.dev" target="_blank" rel="noopener noreferrer" className="group" aria-label="React">
               <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
                 isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
               }`}>
@@ -367,7 +364,7 @@ function App() {
 
             <span className={`text-3xl font-light ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>+</span>
 
-            <a href="https://vitejs.dev" target="_blank" rel="noopener noreferrer" className="group">
+            <a href="https://vitejs.dev" target="_blank" rel="noopener noreferrer" className="group" aria-label="Vite">
               <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
                 isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
               }`}>
@@ -377,7 +374,7 @@ function App() {
 
             <span className={`text-3xl font-light ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>+</span>
 
-            <a href="https://typescriptlang.org" target="_blank" rel="noopener noreferrer" className="group">
+            <a href="https://typescriptlang.org" target="_blank" rel="noopener noreferrer" className="group" aria-label="TypeScript">
               <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
                 isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
               }`}>
@@ -388,7 +385,7 @@ function App() {
 {{#if features.tailwindcss}}
             <span className={`text-3xl font-light ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>+</span>
 
-            <a href="https://tailwindcss.com" target="_blank" rel="noopener noreferrer" className="group">
+            <a href="https://tailwindcss.com" target="_blank" rel="noopener noreferrer" className="group" aria-label="Tailwind CSS">
               <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
                 isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
               }`}>
@@ -400,7 +397,7 @@ function App() {
 {{#if features.redux}}
             <span className={`text-3xl font-light ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>+</span>
 
-            <a href="https://redux-toolkit.js.org" target="_blank" rel="noopener noreferrer" className="group">
+            <a href="https://redux-toolkit.js.org" target="_blank" rel="noopener noreferrer" className="group" aria-label="Redux Toolkit">
               <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
                 isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
               }`}>
@@ -412,7 +409,7 @@ function App() {
 {{#if features.reactRouter}}
             <span className={`text-3xl font-light ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>+</span>
 
-            <a href="https://reactrouter.com" target="_blank" rel="noopener noreferrer" className="group">
+            <a href="https://reactrouter.com" target="_blank" rel="noopener noreferrer" className="group" aria-label="React Router">
               <div className={`p-4 rounded-2xl transition-all duration-300 hover:scale-110 ${
                 isDark ? 'bg-gray-800/50 hover:bg-gray-700/50' : 'bg-white hover:bg-gray-50 shadow-lg'
               }`}>
@@ -468,7 +465,7 @@ function App() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold">{{#if features.i18n}}{t('features.counter.title')}{{else}}useState Hook{{/if}}</h3>
+              <h2 className="text-xl font-bold">{{#if features.i18n}}{t('features.counter.title')}{{else}}useState Hook{{/if}}</h2>
             </div>
             <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               {{#if features.i18n}}{t('features.counter.description')}{{else}}Click the button to increment the counter{{/if}}
@@ -498,7 +495,7 @@ function App() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold">{{#if features.i18n}}{t('features.timer.title')}{{else}}useEffect Hook{{/if}}</h3>
+              <h2 className="text-xl font-bold">{{#if features.i18n}}{t('features.timer.title')}{{else}}useEffect Hook{{/if}}</h2>
             </div>
             <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               {{#if features.i18n}}{t('features.timer.description')}{{else}}Auto-incrementing timer using useEffect{{/if}}
@@ -516,7 +513,7 @@ function App() {
                       : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-green-500/25'
                   }`}
                 >
-                  {isRunning ? {{#if features.i18n}}t('common.stop'){{else}}'Stop'{{/if}} : {{#if features.i18n}}t('common.start'){{else}}'Start'{{/if}}}
+                  {{#if features.i18n}}{isRunning ? t('common.stop') : t('common.start')}{{else}}{isRunning ? 'Stop' : 'Start'}{{/if}}
                 </button>
                 <button
                   onClick={() => setAutoCount(0)}
@@ -543,7 +540,7 @@ function App() {
             <div className="p-2 bg-purple-500/20 rounded-xl">
               <ReduxLogo />
             </div>
-            <h3 className="text-xl font-bold">{{#if features.i18n}}{t('features.redux.title')}{{else}}Redux Theme Selector{{/if}}</h3>
+            <h2 className="text-xl font-bold">{{#if features.i18n}}{t('features.redux.title')}{{else}}Redux Theme Selector{{/if}}</h2>
           </div>
           <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             {{#if features.i18n}}{t('features.redux.description')}{{else}}Theme state managed by Redux Toolkit{{/if}}
@@ -587,7 +584,7 @@ function App() {
             <div className="p-2 bg-green-500/20 rounded-xl">
               <span className="text-2xl">🌐</span>
             </div>
-            <h3 className="text-xl font-bold">{t('features.i18n.title')}</h3>
+            <h2 className="text-xl font-bold">{t('features.i18n.title')}</h2>
           </div>
           <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             {t('features.i18n.description')}
@@ -663,8 +660,8 @@ function App() {
         </div>
       </main>
 
-      <footer style={{ marginTop: '2rem' }}>
-        <p>Made with ❤️ by <a href="https://github.com/klabacher" style={{ color: '#667eea' }}>João Vitor Klabacher</a></p>
+      <footer className="app-footer">
+        <p>Made with ❤️ by <a href="https://github.com/klabacher" className="author-link">João Vitor Klabacher</a></p>
       </footer>
     </div>
 {{/if}}

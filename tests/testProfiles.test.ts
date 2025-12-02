@@ -18,6 +18,7 @@ function createFeatures(overrides: Partial<FeatureFlags> = {}): FeatureFlags {
     tailwindcss: false,
     redux: false,
     reactRouter: false,
+    i18n: false,
     eslint: false,
     prettier: false,
     husky: false,
@@ -38,53 +39,49 @@ describe('testProfiles configuration', () => {
         expect(testProfiles[profile]).toBeDefined();
         expect(testProfiles[profile].name).toBeDefined();
         expect(testProfiles[profile].description).toBeDefined();
-        expect(testProfiles[profile].coverageThreshold).toBeDefined();
-        expect(testProfiles[profile].includeTests).toBeDefined();
+        expect(testProfiles[profile].coverage).toBeDefined();
+        expect(testProfiles[profile].testTypes).toBeDefined();
         expect(testProfiles[profile].dependencies).toBeDefined();
       }
     });
 
     it('should have increasing coverage thresholds', () => {
-      expect(testProfiles.bare.coverageThreshold).toBe(0);
-      expect(testProfiles.minimum.coverageThreshold).toBe(50);
-      expect(testProfiles.standard.coverageThreshold).toBe(70);
-      expect(testProfiles.advanced.coverageThreshold).toBe(80);
-      expect(testProfiles.complete.coverageThreshold).toBe(90);
+      expect(testProfiles.bare.coverage).toBe(0);
+      expect(testProfiles.minimum.coverage).toBe(50);
+      expect(testProfiles.standard.coverage).toBe(70);
+      expect(testProfiles.advanced.coverage).toBe(80);
+      expect(testProfiles.complete.coverage).toBe(90);
     });
 
-    it('bare profile should have no tests included', () => {
-      const { includeTests } = testProfiles.bare;
-      expect(includeTests.unit).toBe(false);
-      expect(includeTests.integration).toBe(false);
-      expect(includeTests.a11y).toBe(false);
-      expect(includeTests.performance).toBe(false);
+    it('bare profile should have no test types', () => {
+      const { testTypes } = testProfiles.bare;
+      expect(testTypes).toHaveLength(0);
     });
 
-    it('complete profile should have all tests included', () => {
-      const { includeTests } = testProfiles.complete;
-      expect(includeTests.unit).toBe(true);
-      expect(includeTests.integration).toBe(true);
-      expect(includeTests.a11y).toBe(true);
-      expect(includeTests.performance).toBe(true);
-      expect(includeTests.snapshot).toBe(true);
+    it('complete profile should include all core test types', () => {
+      const { testTypes } = testProfiles.complete;
+      expect(testTypes).toContain('unit');
+      expect(testTypes).toContain('integration');
+      expect(testTypes).toContain('accessibility');
+      expect(testTypes).toContain('performance');
     });
 
-    it('standard profile should have unit and integration but not a11y', () => {
-      const { includeTests } = testProfiles.standard;
-      expect(includeTests.unit).toBe(true);
-      expect(includeTests.integration).toBe(true);
-      expect(includeTests.a11y).toBe(false);
-      expect(includeTests.performance).toBe(false);
+    it('standard profile should have unit and integration but not accessibility', () => {
+      const { testTypes } = testProfiles.standard;
+      expect(testTypes).toContain('unit');
+      expect(testTypes).toContain('integration');
+      expect(testTypes).not.toContain('accessibility');
+      expect(testTypes).not.toContain('performance');
     });
   });
 
   describe('getTestProfile', () => {
     it('should return correct profile for each profile name', () => {
-      expect(getTestProfile('bare').name).toBe('Bare (Mínimo)');
-      expect(getTestProfile('minimum').name).toBe('Minimum (Básico)');
-      expect(getTestProfile('standard').name).toBe('Standard (Padrão)');
-      expect(getTestProfile('advanced').name).toBe('Advanced (Avançado)');
-      expect(getTestProfile('complete').name).toBe('Complete (Completo)');
+      expect(getTestProfile('bare').name).toBe('Bare');
+      expect(getTestProfile('minimum').name).toBe('Minimum');
+      expect(getTestProfile('standard').name).toBe('Standard');
+      expect(getTestProfile('advanced').name).toBe('Advanced');
+      expect(getTestProfile('complete').name).toBe('Complete');
     });
   });
 

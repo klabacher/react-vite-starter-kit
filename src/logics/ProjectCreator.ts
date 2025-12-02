@@ -170,7 +170,7 @@ async function generateIndexHtml(targetDir: string, projectName: string): Promis
 `;
   await writeFile(join(targetDir, 'index.html'), html);
 }
-
+// This garbage may break things - idk
 async function generateViteConfig(targetDir: string, features: FeatureFlags): Promise<void> {
   const imports = [
     "import { defineConfig } from 'vite';",
@@ -187,7 +187,9 @@ async function generateViteConfig(targetDir: string, features: FeatureFlags): Pr
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [${plugins.join(', ')}],
+      plugins: [
+        ${plugins.join(',\n       ')}
+      ],
 });
 `;
   await writeFile(join(targetDir, 'vite.config.ts'), content);

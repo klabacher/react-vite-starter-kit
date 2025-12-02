@@ -5,6 +5,102 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3-beta.1] - 2025-12-02
+
+### Fixed
+
+- **Vite plugins configuration** - Fixed Tailwind CSS v4 styles not loading by moving plugins from `optimizeDeps.rolldownOptions.plugins` to root `plugins` array in `vite.config.ts`
+
+## [0.2.2] - 2025-12-01
+
+### Fixed
+
+- **SVG attributes** - Changed `clip-rule` to `clipRule` and `fill-rule` to `fillRule` for React JSX compatibility
+
+### Changed
+
+- **Vite/Vitest config** - Updated configuration for rolldown compatibility (note: this was reverted in 0.2.3 due to incorrect plugin placement)
+
+## [0.2.1] - 2025-12-01
+
+### Fixed
+
+- **Git check** - Replaced `require(child_process)` with the equivalent `import`
+- **ProjectNameInput conditional** - Added `.trim()` to initial value in `src/components/ProjectNameInput.tsx`
+- **SVG icons** - Fixed `transform` CSS style for Vite and TypeScript icons
+
+## [0.2.0] - 2025-12-01
+
+Entire Template refactor for better Dx and results, fixed errors
+
+### Added
+
+#### Template Engine Modernization
+
+- **Handlebars.js integration** - Replaced ~500 lines of custom regex-based template processing with industry-standard Handlebars templating engine
+- **Custom Handlebars helpers** - Added `json`, `eq`, `neq`, `and`, `or`, `not`, `includes`, `concat`, `lookup` helpers for advanced template logic
+- **Partials system** - Recursive partial loading from `templates/dynamic/partials/` for reusable template components
+- **IDE syntax highlighting** - All templates renamed from `.template` to `.hbs` for proper editor support
+
+#### Plugin Architecture
+
+- **Plugin interface** - New `Plugin` type with `shouldActivate()`, `getFiles()`, `getDependencies()`, `getDevDependencies()`, `getScripts()` methods
+- **Plugin registry** - `PluginRegistry` for registering and querying plugins by feature flags
+- **10 core plugins** - Modular plugins for each feature:
+  - `tailwindPlugin` - Tailwind CSS v4 configuration
+  - `reduxPlugin` - Redux Toolkit store/slices generation
+  - `reactRouterPlugin` - React Router dependencies
+  - `i18nPlugin` - i18next configuration and locale files
+  - `eslintPlugin` - ESLint flat config generation
+  - `prettierPlugin` - Prettier configuration
+  - `huskyPlugin` - Git hooks and lint-staged setup
+  - `githubActionsPlugin` - CI/CD workflow generation
+  - `vscodePlugin` - Editor settings and extensions
+  - `testingPlugin` - Vitest setup with profile-based configuration
+
+#### Type System Improvements
+
+- **TestProfileConfig modernization** - Replaced `includeTests` object with `testTypes` array for cleaner API
+- **Plugin types** - Added `Plugin`, `PluginContext`, `PluginFile`, `PluginRegistry` interfaces
+- **TestType union** - New type for `'unit' | 'integration' | 'accessibility' | 'performance' | 'snapshot' | 'redux' | 'router' | 'i18n' | 'tailwind'`
+
+### Changed
+
+- **TemplateEngine** - Complete rewrite using Handlebars instead of custom regex parsing
+- **TestGenerator** - Now uses shared `TemplateEngine` instead of duplicated parsing logic
+- **TemplateLogic** - Updated to use `.hbs` file extension and new factory functions
+- **TestProfileConfig** - `coverageThreshold` renamed to `coverage`, `includeTests` replaced with `testTypes` array
+- **TestProfileSelect component** - Updated UI to work with new `testTypes` array format
+
+### Removed
+
+- **Custom regex template parser** - Removed ~300 lines of fragile regex-based parsing code
+- **Duplicated template processing** - TestGenerator no longer has its own template parser
+
+### Technical Details
+
+#### New Files
+
+```
+src/plugins/
+├── index.ts          # Plugin exports and factory
+├── registry.ts       # PluginRegistry implementation
+├── tailwind.ts       # Tailwind CSS plugin
+├── redux.ts          # Redux Toolkit plugin
+├── react-router.ts   # React Router plugin
+├── i18n.ts           # i18next plugin
+├── eslint.ts         # ESLint plugin
+├── prettier.ts       # Prettier plugin
+├── husky.ts          # Husky plugin
+├── github-actions.ts # GitHub Actions plugin
+├── vscode.ts         # VS Code plugin
+└── testing.ts        # Testing plugin
+```
+
+#### Dependencies Added
+
+- `handlebars@^4.7.8` - Template engine
+
 ## [0.1.0-beta.1] - 2025-11-30
 
 ### Added
@@ -229,7 +325,7 @@ src/
 
 ## Roadmap
 
-### [0.1.0] - Planned
+### [0.3.0] - Planned
 
 - [ ] Supabase integration template
 - [ ] Custom TypeScript configurations
@@ -237,7 +333,7 @@ src/
 - [ ] Template caching for faster project creation
 - [ ] Update checker for CLI
 
-### [0.2.0] - Future
+### [0.4.0] - Future
 
 - [ ] Monorepo support
 - [ ] Docker configuration templates

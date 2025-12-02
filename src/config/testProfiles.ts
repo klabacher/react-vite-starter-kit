@@ -1,4 +1,4 @@
-import { TestProfile, TestProfileConfig } from '../types/index.js';
+import type { TestProfile, TestProfileConfig } from '../types/index.js';
 
 /**
  * Test profile configurations defining what tests to include
@@ -6,30 +6,18 @@ import { TestProfile, TestProfileConfig } from '../types/index.js';
  */
 export const testProfiles: Record<TestProfile, TestProfileConfig> = {
   bare: {
-    name: 'Bare (Mínimo)',
-    description: 'Apenas configuração básica do Vitest sem testes',
-    coverageThreshold: 0,
-    includeTests: {
-      unit: false,
-      integration: false,
-      a11y: false,
-      performance: false,
-      snapshot: false,
-    },
+    name: 'Bare',
+    description: 'Basic Vitest setup without tests',
+    coverage: 0,
+    testTypes: [],
     dependencies: ['vitest', 'jsdom', '@testing-library/react', '@testing-library/jest-dom'],
   },
 
   minimum: {
-    name: 'Minimum (Básico)',
-    description: 'Testes unitários básicos com 50% de cobertura',
-    coverageThreshold: 50,
-    includeTests: {
-      unit: true,
-      integration: false,
-      a11y: false,
-      performance: false,
-      snapshot: true,
-    },
+    name: 'Minimum',
+    description: 'Basic unit tests with 50% coverage',
+    coverage: 50,
+    testTypes: ['unit', 'snapshot'],
     dependencies: [
       'vitest',
       'jsdom',
@@ -40,16 +28,10 @@ export const testProfiles: Record<TestProfile, TestProfileConfig> = {
   },
 
   standard: {
-    name: 'Standard (Padrão)',
-    description: 'Testes unitários e de integração com 70% de cobertura',
-    coverageThreshold: 70,
-    includeTests: {
-      unit: true,
-      integration: true,
-      a11y: false,
-      performance: false,
-      snapshot: true,
-    },
+    name: 'Standard',
+    description: 'Unit and integration tests with 70% coverage',
+    coverage: 70,
+    testTypes: ['unit', 'integration', 'snapshot', 'redux', 'router', 'i18n'],
     dependencies: [
       'vitest',
       'jsdom',
@@ -61,16 +43,19 @@ export const testProfiles: Record<TestProfile, TestProfileConfig> = {
   },
 
   advanced: {
-    name: 'Advanced (Avançado)',
-    description: 'Testes completos com acessibilidade e 80% de cobertura',
-    coverageThreshold: 80,
-    includeTests: {
-      unit: true,
-      integration: true,
-      a11y: true,
-      performance: false,
-      snapshot: true,
-    },
+    name: 'Advanced',
+    description: 'Complete tests with accessibility and 80% coverage',
+    coverage: 80,
+    testTypes: [
+      'unit',
+      'integration',
+      'accessibility',
+      'snapshot',
+      'redux',
+      'router',
+      'i18n',
+      'tailwind',
+    ],
     dependencies: [
       'vitest',
       'jsdom',
@@ -85,16 +70,20 @@ export const testProfiles: Record<TestProfile, TestProfileConfig> = {
   },
 
   complete: {
-    name: 'Complete (Completo)',
-    description: 'Todos os tipos de testes com 90%+ de cobertura',
-    coverageThreshold: 90,
-    includeTests: {
-      unit: true,
-      integration: true,
-      a11y: true,
-      performance: true,
-      snapshot: true,
-    },
+    name: 'Complete',
+    description: 'All test types with 90%+ coverage',
+    coverage: 90,
+    testTypes: [
+      'unit',
+      'integration',
+      'accessibility',
+      'performance',
+      'snapshot',
+      'redux',
+      'router',
+      'i18n',
+      'tailwind',
+    ],
     dependencies: [
       'vitest',
       'jsdom',
@@ -142,5 +131,5 @@ export function getTestDependencies(profile: TestProfile): string[] {
  * Get coverage threshold for a test profile
  */
 export function getCoverageThreshold(profile: TestProfile): number {
-  return testProfiles[profile].coverageThreshold;
+  return testProfiles[profile].coverage;
 }
