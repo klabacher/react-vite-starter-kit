@@ -5,11 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Dev-0.2.1] - 2025-12-01
+## [0.2.2] - 2025-12-01
+
+### Small improvements and stability
+
+- **Patch 0.2.1** - `clip-rule` to `clipRule` and `fill-rule` to `fillRule`
+
+- **Dependencie Fix** - `vite.config.ts`/`vitest.config.ts` add `rolldown` updated configuration
+
+## [0.2.1] - 2025-12-01
 
 Small visual fix
 
-### Fixed
+### fix Implemented
 
 - **Fixed Git check** - Replaced `require(child_process)` with the equivalent `import`
 - **Fixed ProjectNameInput conditional** - Added `.trim()` to initial value in `src/components/ProjectNameInput.tsx#ProjectNameInput:37`

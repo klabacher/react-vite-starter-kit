@@ -384,7 +384,11 @@ describe('App', () => {
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
+  optimizeDeps: {
+    rolldownOptions: {
+      plugins: [react()],
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',
