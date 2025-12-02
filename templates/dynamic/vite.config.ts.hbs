@@ -6,10 +6,13 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
+  optimizeDeps: {
+    rolldownOptions: {
+      plugins: [
 {{#if features.tailwindcss}}
-    tailwindcss(),
+        tailwindcss(),
 {{/if}}
-    react(),
-  ],
+        react(),
+    ],
+  },
 });
