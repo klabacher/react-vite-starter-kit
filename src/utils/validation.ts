@@ -1,4 +1,5 @@
 import validateNpmPackageName from 'validate-npm-package-name';
+import { execSync } from 'child_process';
 
 export interface ValidationResult {
   valid: boolean;
@@ -52,7 +53,6 @@ export function suggestValidName(name: string): string {
 
 export function isGitInstalled(): boolean {
   try {
-    const { execSync } = require('child_process');
     execSync('git --version', { stdio: 'ignore' });
     return true;
   } catch {
