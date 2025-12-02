@@ -1,4 +1,4 @@
-      # react-vite-starter-kit
+# react-vite-starter-kit
 
       [![npm version](https://img.shields.io/npm/v/react-vite-starter-kit.svg)](https://www.npmjs.com/package/react-vite-starter-kit)
       [![npm downloads](https://img.shields.io/npm/dm/react-vite-starter-kit.svg)](https://www.npmjs.com/package/react-vite-starter-kit)
